@@ -30,5 +30,4 @@ export interface Order {
   }[];
   customer: Customer;
   paymentMethod: 'pay_now' | 'pay_in_store';
-  totalPrice: number;
 } 

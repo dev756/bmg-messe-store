@@ -221,7 +221,7 @@ const submitOrder = async (): Promise<void> => {
         sku: item.sku,
         quantity: item.quantity
       })),
-      paymentMethod: form.value.paymentMethod
+      paymentMethod: form.value.paymentMethod as 'pay_now' | 'pay_in_store'
     };
 
     await createOrder(order);
