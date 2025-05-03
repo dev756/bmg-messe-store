@@ -47,59 +47,69 @@
       <div class="checkout-form">
         <h2>Contact Information</h2>
         <form @submit.prevent="submitOrder">
-          <div class="form-group">
-            <label for="name">Full Name</label>
-            <input 
-              type="text" 
-              id="name" 
-              v-model="form.name" 
-              required
-              placeholder="Enter your full name"
-              :class="{ 'error': showNameError }"
-              @input="validateName"
-            />
-            <span v-if="showNameError" class="error-message">Please enter your name</span>
+          <div class="name-fields">
+            <div class="form-group">
+              <label for="firstName">First Name</label>
+              <input
+                type="text"
+                id="firstName"
+                v-model="form.firstName"
+                @blur="validateFirstName"
+                :class="{ 'error': firstNameError }"
+                placeholder="Enter your first name"
+              />
+              <span class="error-message" v-if="firstNameError">{{ firstNameError }}</span>
+            </div>
+
+            <div class="form-group">
+              <label for="lastName">Last Name</label>
+              <input
+                type="text"
+                id="lastName"
+                v-model="form.lastName"
+                @blur="validateLastName"
+                :class="{ 'error': lastNameError }"
+                placeholder="Enter your last name"
+              />
+              <span class="error-message" v-if="lastNameError">{{ lastNameError }}</span>
+            </div>
           </div>
-          
+
           <div class="form-group">
             <label for="email">Email</label>
-            <div class="email-input-wrapper">
-              <input 
-                type="email" 
-                id="email" 
-                v-model="form.email" 
-                required
-                placeholder="Enter your email"
-                :class="{ 'error': showEmailError }"
-                @input="validateEmail"
-              />
-              <span v-if="showEmailError" class="error-icon">⚠️</span>
-            </div>
-            <span v-if="showEmailError" class="error-message">Please enter a valid email address</span>
+            <input
+              type="email"
+              id="email"
+              v-model="form.email"
+              @blur="validateEmail"
+              :class="{ 'error': emailError }"
+              placeholder="Enter your email"
+            />
+            <span class="error-message" v-if="emailError">{{ emailError }}</span>
           </div>
 
           <div class="form-group">
             <label>Payment Method</label>
             <div class="payment-options">
-              <label class="payment-option disabled">
+              <div class="payment-option disabled">
                 <input 
                   type="radio" 
                   v-model="form.paymentMethod" 
                   value="pay_now"
                   disabled
                 />
-                <span class="payment-label">Pay Now (Coming Soon)</span>
-              </label>
+                <label class="payment-label">Pay Now (Coming Soon)</label>
+              </div>
               
-              <label class="payment-option">
+              <div class="payment-option">
                 <input 
                   type="radio" 
                   v-model="form.paymentMethod" 
                   value="pay_in_store"
                   required
                 />
-                <span class="payment-label">Pay in Store</span>
-              </label>
+                <label class="payment-label">Pay in Store</label>
+              </div>
             </div>
           </div>
           
@@ -109,6 +119,12 @@
         </form>
       </div>
     </div>
+    <Toast
+      v-if="showToast"
+      :message="toastMessage"
+      :type="toastType"
+      @close="showToast = false"
+    />
   </div>
 </template>
 
@@ -118,85 +134,112 @@ import { useRouter } from 'vue-router';
 import { useCartStore } from '../stores/cart';
 import { useProductStore } from '../stores/products';
 import type { Order, Customer } from '../types';
+import Toast from '../components/Toast.vue';
+import { createOrder } from '../services/api';
 
 const router = useRouter();
 const cartStore = useCartStore();
 const productStore = useProductStore();
 const isSubmitting = ref(false);
+const showToast = ref(false);
+const toastMessage = ref('');
+const toastType = ref<'success' | 'error'>('error');
 const showEmailError = ref(false);
 const showNameError = ref(false);
 
-interface FormData {
-  name: string;
-  email: string;
-  paymentMethod: 'pay_now' | 'pay_in_store';
-}
-
-const form = ref<FormData>({
-  name: '',
+const form = ref({
+  firstName: '',
+  lastName: '',
   email: '',
   paymentMethod: 'pay_in_store'
 });
 
-const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const firstNameError = ref('');
+const lastNameError = ref('');
+const emailError = ref('');
 
-const validateEmail = (): void => {
-  showEmailError.value = form.value.email !== '' && !emailRegex.test(form.value.email);
+const generateOrderNumber = () => {
+  const year = new Date().getFullYear().toString().slice(-2);
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let result = '';
+  for (let i = 0; i < 6; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return `KS-${year}-${result}`;
 };
 
-const validateName = (): void => {
-  showNameError.value = form.value.name.trim() === '';
+const validateFirstName = () => {
+  if (!form.value.firstName.trim()) {
+    firstNameError.value = 'First name is required';
+    return false;
+  }
+  firstNameError.value = '';
+  return true;
 };
 
-const isFormValid = computed((): boolean => {
-  return form.value.name.trim() !== '' && 
-         emailRegex.test(form.value.email);
+const validateLastName = () => {
+  if (!form.value.lastName.trim()) {
+    lastNameError.value = 'Last name is required';
+    return false;
+  }
+  lastNameError.value = '';
+  return true;
+};
+
+const validateEmail = () => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!form.value.email) {
+    emailError.value = 'Email is required';
+    return false;
+  }
+  if (!emailRegex.test(form.value.email)) {
+    emailError.value = 'Please enter a valid email address';
+    return false;
+  }
+  emailError.value = '';
+  return true;
+};
+
+const isFormValid = computed(() => {
+  return validateFirstName() && validateLastName() && validateEmail();
 });
 
 const submitOrder = async (): Promise<void> => {
-  if (isSubmitting.value || !isFormValid.value) return;
+  if (!isFormValid.value) return;
   
   isSubmitting.value = true;
   
   try {
     const order: Order = {
+      orderNumber: generateOrderNumber(),
+      customer: {
+        firstName: form.value.firstName,
+        lastName: form.value.lastName,
+        email: form.value.email
+      },
       items: cartStore.items.map(item => ({
         sku: item.sku,
         quantity: item.quantity
       })),
-      customer: {
-        name: form.value.name,
-        email: form.value.email
-      } as Customer,
-      paymentMethod: form.value.paymentMethod,
-      totalPrice: cartStore.totalPrice
+      paymentMethod: form.value.paymentMethod
     };
-    
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    // Update stock levels
-    for (const item of cartStore.items) {
-      const product = productStore.products.find(p => p.sku === item.sku);
-      if (product) {
-        product.stockLevel -= item.quantity;
-      }
-    }
-    
-    // Generate a random order number
-    const orderNumber = 'ORD-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+
+    await createOrder(order);
     
     // Clear cart and redirect to success page
     cartStore.clearCart();
     router.push({
       name: 'order-success',
       params: {
-        orderNumber,
+        orderNumber: order.orderNumber,
         paymentMethod: form.value.paymentMethod === 'pay_now' ? 'Pay Now' : 'Pay in Store'
       }
     });
   } catch (error) {
-    console.error('Error submitting order:', error);
+    console.error('Failed to place order:', error);
+    showToast.value = true;
+    toastMessage.value = 'Failed to place order. Please try again.';
+    toastType.value = 'error';
   } finally {
     isSubmitting.value = false;
   }
@@ -328,32 +371,36 @@ h1 {
   margin-bottom: 1.5rem;
 }
 
-label {
+.form-group label {
   display: block;
-  color: var(--text-color);
   margin-bottom: 0.5rem;
   font-weight: 500;
-}
-
-input[type="text"],
-input[type="email"],
-textarea {
-  width: 100%;
-  padding: 0.8rem;
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
-  background-color: var(--background-dark);
   color: var(--text-color);
-  font-size: 1rem;
-  transition: all 0.3s ease;
 }
 
-input[type="text"]:focus,
-input[type="email"]:focus,
-textarea:focus {
+.form-group input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  transition: border-color 0.2s;
+}
+
+.form-group input:focus {
   outline: none;
   border-color: var(--primary-color);
-  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+}
+
+.form-group input.error {
+  border-color: #dc3545;
+}
+
+.error-message {
+  color: #dc3545;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+  display: block;
 }
 
 .place-order-btn {
@@ -382,7 +429,8 @@ textarea:focus {
 }
 
 .payment-options {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: 1rem;
   margin-top: 0.5rem;
 }
@@ -390,7 +438,7 @@ textarea:focus {
 .payment-option {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 1rem;
   cursor: pointer;
   padding: 1rem;
   border: 1px solid var(--border-color);
@@ -399,19 +447,11 @@ textarea:focus {
   background-color: var(--background-dark);
 }
 
-.payment-option:hover {
-  border-color: var(--primary-color);
-}
-
 .payment-option input[type="radio"] {
   width: 1.2rem;
   height: 1.2rem;
   accent-color: var(--primary-color);
-}
-
-.payment-option input[type="radio"]:checked + .payment-label {
-  color: var(--primary-color);
-  font-weight: 600;
+  margin: 0;
 }
 
 .payment-label {
@@ -419,6 +459,10 @@ textarea:focus {
   font-weight: 500;
   font-size: 1.1rem;
   transition: all 0.3s ease;
+  cursor: pointer;
+  line-height: 1;
+  position: relative;
+  top: 3px;
 }
 
 .payment-option input[type="radio"]:checked ~ .payment-option {
@@ -438,46 +482,11 @@ textarea:focus {
   .checkout-form {
     order: 1;
   }
-}
 
-.email-input-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.error-icon {
-  position: absolute;
-  right: 1rem;
-  color: #ff4444;
-  font-size: 1.2rem;
-}
-
-input.error {
-  border-color: #ff4444;
-  background-color: rgba(255, 68, 68, 0.05);
-}
-
-.error-message {
-  color: #ff4444;
-  font-size: 0.9rem;
-  margin-top: 0.5rem;
-  display: block;
-}
-
-.payment-option.disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  background-color: var(--background-dark);
-}
-
-.payment-option.disabled:hover {
-  border-color: var(--border-color);
-  background-color: var(--background-dark);
-}
-
-.payment-option.disabled .payment-label {
-  color: var(--text-secondary);
+  .name-fields {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
 }
 
 .processing-overlay {
@@ -529,5 +538,12 @@ input.error {
   to {
     transform: rotate(360deg);
   }
+}
+
+.name-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
 }
 </style> 

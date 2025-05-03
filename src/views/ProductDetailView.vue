@@ -12,8 +12,8 @@
       </div>
       <div class="product-info">
         <h1>{{ product.name }}</h1>
-        <p class="description">{{ product.description }}</p>
         <p class="price">CHF {{ product.price.toFixed(2) }}</p>
+        <div class="description" v-html="product.description"></div>
         <p class="stock" :class="{ 'low-stock': product.stockLevel <= 5 }">
           {{ product.stockLevel === 0 ? 'Out of Stock' : `${product.stockLevel} in stock` }}
         </p>

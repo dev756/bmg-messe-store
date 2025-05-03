@@ -10,7 +10,7 @@ export async function fetchProducts(): Promise<Product[]> {
   }
 
   try {
-    const response = await fetch(`${API_BASE_URL}/products`);
+    const response = await fetch(`${API_BASE_URL}/Actindo.Modules.Actindo.POS.ClickAndCollectShop.getOffers`);
     if (!response.ok) {
       throw new Error('Failed to fetch products');
     }
@@ -28,23 +28,22 @@ export async function createOrder(orderData: any): Promise<{ orderNumber: string
   }
 
   try {
-    const payload = {
-      orderNumber: orderData.orderNumber,
-      email: orderData.customer.email,
-      name: orderData.customer.name,
-      token: "XT4RSerZNG7mStjdTJm8r9W3rq",
-      lineItems: orderData.items.map(item => ({
-        sku: item.sku,
-        quantity: item.quantity
-      }))
-    };
+    const formData = new FormData();
+    formData.append('orderNumber', orderData.orderNumber);
+    formData.append('email', orderData.customer.email);
+    formData.append('firstName', orderData.customer.firstName);
+    formData.append('lastName', orderData.customer.lastName);
+    formData.append('token', 'XT4RSerZNG7mStjdTJm8r9W3rq');
+    
+    // Add line items
+    orderData.items.forEach((item, index) => {
+      formData.append(`lineItems[${index}][sku]`, item.sku);
+      formData.append(`lineItems[${index}][quantity]`, item.quantity.toString());
+    });
 
     const response = await fetch(`${API_BASE_URL}/Actindo.Modules.Actindo.POS.ClickAndCollectShop.placeOrder`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload)
+      body: formData
     });
     
     if (!response.ok) {

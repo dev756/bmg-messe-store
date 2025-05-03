@@ -17,11 +17,13 @@ export interface CartItem {
 }
 
 export interface Customer {
-  name: string;
+  firstName: string;
+  lastName: string;
   email: string;
 }
 
 export interface Order {
+  orderNumber: string;
   items: {
     sku: string;
     quantity: number;
