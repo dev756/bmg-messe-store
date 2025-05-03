@@ -3,24 +3,32 @@
     <div class="confirmation-card">
       <div class="success-icon">✓</div>
       <h1>Order Confirmed!</h1>
+      <p class="order-number">Order #{{ orderNumber }}</p>
       
-      <div class="order-details">
-        <h2>Order Details</h2>
-        <p class="order-number">Order Number: {{ orderNumber }}</p>
+      <div class="confirmation-details">
+        <div class="detail-section">
+          <h2>Payment Information</h2>
+          <p class="payment-method">
+            Payment Method: {{ paymentMethodDisplay }}
+          </p>
+        </div>
         
-        <div class="payment-info">
-          <h3>Payment Information</h3>
-          <p v-if="paymentMethod === 'pickup'">
-            You have chosen to pay on pickup. Please bring your order number when collecting your order.
+        <div class="detail-section">
+          <h2>What's Next?</h2>
+          <p v-if="paymentMethod === 'cash'">
+            Please have the exact amount ready when your order arrives.
           </p>
           <p v-else>
-            Thank you for your payment. Your order is being processed.
+            Your payment has been processed successfully.
+          </p>
+          <p class="delivery-info">
+            We'll notify you when your order is ready for pickup or delivery.
           </p>
         </div>
       </div>
       
       <router-link to="/" class="continue-shopping">
-        Return to Home
+        Continue Shopping
       </router-link>
     </div>
   </div>
@@ -32,72 +40,130 @@ import { useRoute } from 'vue-router';
 
 const route = useRoute();
 
-const orderNumber = computed(() => route.query.orderNumber as string);
-const paymentMethod = computed(() => route.query.paymentMethod as 'immediate' | 'pickup');
+const orderNumber = computed(() => route.params.orderNumber);
+const paymentMethod = computed(() => route.params.paymentMethod);
+
+const paymentMethodDisplay = computed(() => {
+  switch (paymentMethod.value) {
+    case 'credit':
+      return 'Credit Card';
+    case 'debit':
+      return 'Debit Card';
+    case 'cash':
+      return 'Cash on Delivery';
+    default:
+      return 'Unknown';
+  }
+});
 </script>
 
 <style scoped>
 .order-confirmation {
   padding: 2rem;
+  min-height: calc(100vh - 64px);
   display: flex;
-  justify-content: center;
   align-items: center;
-  min-height: calc(100vh - 200px);
+  justify-content: center;
 }
 
 .confirmation-card {
-  background-color: white;
+  background-color: var(--background-light);
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
   padding: 3rem;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  text-align: center;
   max-width: 600px;
   width: 100%;
+  text-align: center;
 }
 
 .success-icon {
-  background-color: #4CAF50;
-  color: white;
-  width: 60px;
-  height: 60px;
+  width: 80px;
+  height: 80px;
+  background-color: var(--primary-color);
+  color: var(--background-dark);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 2rem;
+  font-size: 2.5rem;
   margin: 0 auto 1.5rem;
 }
 
-.order-details {
-  margin: 2rem 0;
-  text-align: left;
+h1 {
+  color: var(--text-color);
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin: 0 0 1rem;
 }
 
 .order-number {
+  color: var(--primary-color);
   font-size: 1.2rem;
-  color: #666;
-  margin: 1rem 0;
+  font-weight: 600;
+  margin: 0 0 2rem;
 }
 
-.payment-info {
-  background-color: #f8f8f8;
-  padding: 1.5rem;
-  border-radius: 8px;
-  margin-top: 1rem;
+.confirmation-details {
+  text-align: left;
+  margin-bottom: 2rem;
+}
+
+.detail-section {
+  margin-bottom: 2rem;
+}
+
+.detail-section:last-child {
+  margin-bottom: 0;
+}
+
+h2 {
+  color: var(--text-color);
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin: 0 0 1rem;
+}
+
+.payment-method {
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.delivery-info {
+  color: var(--text-secondary);
+  margin: 1rem 0 0;
 }
 
 .continue-shopping {
   display: inline-block;
+  background-color: var(--primary-color);
+  color: var(--background-dark);
   padding: 1rem 2rem;
-  background-color: #ffc72c;
-  color: #27251f;
+  border-radius: 6px;
   text-decoration: none;
-  border-radius: 4px;
-  font-weight: bold;
-  transition: background-color 0.2s;
+  font-weight: 600;
+  transition: all 0.3s ease;
 }
 
 .continue-shopping:hover {
-  background-color: #ffd54f;
+  background-color: var(--text-secondary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 768px) {
+  .confirmation-card {
+    padding: 2rem;
+  }
+  
+  h1 {
+    font-size: 2rem;
+  }
+  
+  .success-icon {
+    width: 60px;
+    height: 60px;
+    font-size: 2rem;
+  }
 }
 </style> 

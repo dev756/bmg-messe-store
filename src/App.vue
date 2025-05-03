@@ -9,7 +9,9 @@ const { totalItems } = storeToRefs(cartStore);
 <template>
   <div class="app">
     <nav class="navbar">
-      <router-link to="/" class="logo">McShop</router-link>
+      <router-link to="/" class="logo">
+        <img src="./assets/logo.svg" alt="Kapten & Son" class="logo-img" />
+      </router-link>
       <div class="nav-links">
         <router-link to="/cart" class="cart-link">
           Cart ({{ totalItems || 0 }})
@@ -24,46 +26,77 @@ const { totalItems } = storeToRefs(cartStore);
 </template>
 
 <style>
+:root {
+  --primary-color: #000000;
+  --background-dark: #ffffff;
+  --background-light: rgb(237, 234, 230);
+  --text-color: #000000;
+  --text-secondary: #666666;
+  --accent-color: #000000;
+  --border-color: #e0e0e0;
+}
+
 .app {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  background-color: var(--background-dark);
+  color: var(--text-color);
+  font-family: 'UncutSans', sans-serif;
 }
 
 .navbar {
-  background-color: #ffc72c;
-  padding: 1rem 2rem;
+  background-color: var(--background-dark);
+  padding: 1.5rem 2rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid var(--border-color);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(10px);
+  background-color: rgba(255, 255, 255, 0.8);
+  min-width: 700px;
 }
 
 .logo {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #27251f;
   text-decoration: none;
+  display: flex;
+  align-items: center;
+}
+
+.logo-img {
+  height: 40px;
+  width: auto;
 }
 
 .nav-links {
   display: flex;
-  gap: 1rem;
+  gap: 1.5rem;
 }
 
 .cart-link {
-  color: #27251f;
+  color: var(--text-color);
   text-decoration: none;
-  padding: 0.5rem 1rem;
+  padding: 0.8rem 1.5rem;
   border-radius: 4px;
-  background-color: #fff;
+  background-color: var(--background-light);
+  border: 1px solid var(--border-color);
+  font-weight: 500;
+  transition: all 0.3s ease;
+  font-family: 'UncutSans', sans-serif;
+}
+
+.cart-link:hover {
+  background-color: var(--primary-color);
+  color: var(--background-dark);
+  border-color: var(--primary-color);
 }
 
 .main-content {
   flex: 1;
   padding: 2rem;
-  max-width: 1200px;
-  margin: 0 auto;
   width: 100%;
 }
 
@@ -75,8 +108,53 @@ const { totalItems } = storeToRefs(cartStore);
 }
 
 body {
-  font-family: Arial, sans-serif;
+  font-family: 'UncutSans', sans-serif;
   line-height: 1.6;
-  color: #333;
+  color: var(--text-color);
+  background-color: var(--background-dark);
+}
+
+/* Add custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background-dark);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-color);
+}
+
+/* Add smooth transitions */
+a, button {
+  transition: all 0.3s ease;
+}
+
+/* Add text selection color */
+::selection {
+  background-color: var(--primary-color);
+  color: var(--background-dark);
+}
+
+@media (max-width: 700px) {
+  .navbar {
+    padding: 1rem;
+  }
+  
+  .logo-img {
+    height: 30px;
+  }
+  
+  .cart-link {
+    padding: 0.6rem 1rem;
+    font-size: 0.9rem;
+  }
 }
 </style>
