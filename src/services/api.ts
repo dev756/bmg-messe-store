@@ -55,4 +55,29 @@ export async function createOrder(orderData: any): Promise<{ orderNumber: string
     console.error('Error creating order:', error);
     throw error;
   }
+}
+
+export async function checkPassword(password: string): Promise<boolean> {
+  if (USE_MOCK_API) {
+    return password === 'test';
+  }
+
+  try {
+    const formData = new FormData();
+    formData.append('password', password);
+    
+    const response = await fetch(`${API_BASE_URL}/Actindo.Modules.Actindo.POS.ClickAndCollectShop.checkPassword`, {
+      method: 'POST',
+      body: formData
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to check password');
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error checking password:', error);
+    throw error;
+  }
 } 

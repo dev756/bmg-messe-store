@@ -1,27 +1,65 @@
 <script setup lang="ts">
+import { ref, onMounted } from 'vue';
 import { useCartStore } from './stores/cart';
 import { storeToRefs } from 'pinia';
+import PasswordScreen from './components/PasswordScreen.vue';
+import { checkPassword } from './services/api';
 
 const cartStore = useCartStore();
 const { totalItems } = storeToRefs(cartStore);
+const isAuthenticated = ref(false);
+
+async function verifyStoredPassword() {
+  const storedPassword = localStorage.getItem('store_password');
+  if (!storedPassword) {
+    isAuthenticated.value = false;
+    return;
+  }
+
+  try {
+    const isValid = await checkPassword(storedPassword);
+    isAuthenticated.value = isValid;
+    if (!isValid) {
+      localStorage.removeItem('store_password');
+    }
+  } catch (error) {
+    console.error('Error verifying password:', error);
+    isAuthenticated.value = false;
+    localStorage.removeItem('store_password');
+  }
+}
+
+function handleAuthenticated() {
+  isAuthenticated.value = true;
+}
+
+onMounted(async () => {
+  await verifyStoredPassword();
+});
 </script>
 
 <template>
   <div class="app">
-    <nav class="navbar">
-      <router-link to="/" class="logo">
-        <img src="./assets/logo.svg" alt="Kapten & Son" class="logo-img" />
-      </router-link>
-      <div class="nav-links">
-        <router-link to="/cart" class="cart-link">
-          Cart ({{ totalItems || 0 }})
+    <PasswordScreen
+      v-if="!isAuthenticated"
+      @authenticated="handleAuthenticated"
+    />
+    <template v-else>
+      <nav class="navbar">
+        <router-link to="/" class="logo">
+          <img src="./assets/logo.svg" alt="Kapten & Son" class="logo-img" />
         </router-link>
-      </div>
-    </nav>
-    
-    <main class="main-content">
-      <router-view></router-view>
-    </main>
+        <div class="nav-links">
+          <router-link to="/cart" class="cart-link">
+            Cart ({{ totalItems || 0 }})
+          </router-link>
+        </div>
+      </nav>
+      
+      <main class="main-content">
+        <router-view></router-view>
+      </main>
+    </template>
   </div>
 </template>
 
