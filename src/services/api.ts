@@ -34,6 +34,10 @@ export async function createOrder(orderData: any): Promise<{ orderNumber: string
     formData.append('firstName', orderData.customer.firstName);
     formData.append('lastName', orderData.customer.lastName);
     formData.append('token', 'XT4RSerZNG7mStjdTJm8r9W3rq');
+    formData.append('city', orderData.customer.city);
+    formData.append('zipCode', orderData.customer.zipCode);
+    formData.append('address', orderData.customer.address);
+    formData.append('country', orderData.customer.country);
     
     // Add line items
     orderData.items.forEach((item, index) => {

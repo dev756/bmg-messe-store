@@ -20,6 +20,10 @@ export interface Customer {
   firstName: string;
   lastName: string;
   email: string;
+  address: string;
+  zipCode: string;
+  city: string;
+  country: string;
 }
 
 export interface Order {
@@ -29,5 +33,4 @@ export interface Order {
     quantity: number;
   }[];
   customer: Customer;
-  paymentMethod: 'pay_now' | 'pay_in_store';
 } 

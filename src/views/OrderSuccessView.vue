@@ -6,8 +6,15 @@
       <p class="message">Thank you for your order. We'll notify you when it's ready for pickup.</p>
       <div class="order-details">
         <p>Order Number: {{ orderNumber }}</p>
-        <p>Payment Method: {{ paymentMethod }}</p>
+        <p>Total Amount: CHF {{ totalAmount.toFixed(2) }}</p>
       </div>
+
+      <PaymentQRCode 
+        :order-number="orderNumber"
+        :amount="totalAmount"
+        class="payment-section"
+      />
+
       <router-link to="/" class="continue-shopping">
         Continue Shopping
       </router-link>
@@ -18,10 +25,21 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
+import PaymentQRCode from '../components/PaymentQRCode.vue';
 
 const route = useRoute();
-const orderNumber = ref(route.params.orderNumber || '');
-const paymentMethod = ref(route.params.paymentMethod || '');
+const orderNumber = ref(typeof route.params.orderNumber === 'string' ? route.params.orderNumber : '');
+const totalAmount = ref(0);
+
+onMounted(async () => {
+  try {
+    // TODO: Replace with actual API call to get order details
+    // This is a placeholder that sets a dummy amount
+    totalAmount.value = 99.99;
+  } catch (error) {
+    console.error('Failed to fetch order details:', error);
+  }
+});
 </script>
 
 <style scoped>
@@ -80,6 +98,10 @@ h1 {
   color: var(--text-color);
   margin: 0.5rem 0;
   font-size: 1.1rem;
+}
+
+.payment-section {
+  margin-bottom: 2rem;
 }
 
 .continue-shopping {

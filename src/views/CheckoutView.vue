@@ -57,6 +57,7 @@
                 @blur="validateFirstName"
                 :class="{ 'error': firstNameError }"
                 placeholder="Enter your first name"
+                ref="firstNameInput"
               />
               <span class="error-message" v-if="firstNameError">{{ firstNameError }}</span>
             </div>
@@ -89,29 +90,80 @@
           </div>
 
           <div class="form-group">
-            <label>Payment Method</label>
-            <div class="payment-options">
-              <div class="payment-option disabled">
-                <input 
-                  type="radio" 
-                  v-model="form.paymentMethod" 
-                  value="pay_now"
-                  disabled
-                />
-                <label class="payment-label">Pay Now (Coming Soon)</label>
-              </div>
-              
-              <div class="payment-option">
-                <input 
-                  type="radio" 
-                  v-model="form.paymentMethod" 
-                  value="pay_in_store"
-                  required
-                />
-                <label class="payment-label">Pay in Store</label>
-              </div>
+            <label for="address">Address</label>
+            <input
+              type="text"
+              id="address"
+              v-model="form.address"
+              @blur="validateAddress"
+              :class="{ 'error': addressError }"
+              placeholder="Enter your street address"
+            />
+            <span class="error-message" v-if="addressError">{{ addressError }}</span>
+          </div>
+
+          <div class="address-fields">
+            <div class="form-group">
+              <label for="zipCode">ZIP Code</label>
+              <input
+                type="text"
+                id="zipCode"
+                v-model="form.zipCode"
+                @blur="validateZipCode"
+                :class="{ 'error': zipCodeError }"
+                placeholder="Enter ZIP code"
+              />
+              <span class="error-message" v-if="zipCodeError">{{ zipCodeError }}</span>
+            </div>
+
+            <div class="form-group">
+              <label for="city">City</label>
+              <input
+                type="text"
+                id="city"
+                v-model="form.city"
+                @blur="validateCity"
+                :class="{ 'error': cityError }"
+                placeholder="Enter city"
+              />
+              <span class="error-message" v-if="cityError">{{ cityError }}</span>
             </div>
           </div>
+
+          <div class="form-group">
+            <label for="country">Country</label>
+            <select
+              id="country"
+              v-model="form.country"
+              :class="{ 'error': countryError }"
+            >
+              <option value="CH">Switzerland</option>
+              <option value="DE">Germany</option>
+              <option value="AT">Austria</option>
+              <option value="IT">Italy</option>
+              <option value="FR">France</option>
+              <option value="LI">Liechtenstein</option>
+            </select>
+            <span class="error-message" v-if="countryError">{{ countryError }}</span>
+          </div>
+
+          <div class="payment-info">
+            <h3>Payment Information</h3>
+            <p>You can pay for your order in two ways:</p>
+            <ul>
+              <li>Pay in store when picking up your order</li>
+              <li>Pay in advance using our mobile app (QR code will be shown after order confirmation)</li>
+            </ul>
+          </div>
+
+          <button 
+            v-if="isDev" 
+            type="button" 
+            class="fill-test-data-btn"
+            @click="fillTestData"
+          >
+            Fill Test Data
+          </button>
           
           <button type="submit" class="place-order-btn" :disabled="isSubmitting || !isFormValid">
             {{ isSubmitting ? 'Processing...' : 'Place Order' }}
@@ -129,7 +181,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useCartStore } from '../stores/cart';
 import { useProductStore } from '../stores/products';
@@ -144,19 +196,32 @@ const isSubmitting = ref(false);
 const showToast = ref(false);
 const toastMessage = ref('');
 const toastType = ref<'success' | 'error'>('error');
-const showEmailError = ref(false);
-const showNameError = ref(false);
+
+const isDev = ref(import.meta.env.MODE === 'development');
 
 const form = ref({
   firstName: '',
   lastName: '',
   email: '',
-  paymentMethod: 'pay_in_store'
+  address: '',
+  zipCode: '',
+  city: '',
+  country: 'CH'
 });
 
 const firstNameError = ref('');
 const lastNameError = ref('');
 const emailError = ref('');
+const addressError = ref('');
+const zipCodeError = ref('');
+const cityError = ref('');
+const countryError = ref('');
+
+const firstNameInput = ref<HTMLInputElement | null>(null);
+
+onMounted(() => {
+  firstNameInput.value?.focus();
+});
 
 const generateOrderNumber = () => {
   const year = new Date().getFullYear().toString().slice(-2);
@@ -200,8 +265,56 @@ const validateEmail = () => {
   return true;
 };
 
+const validateAddress = () => {
+  if (!form.value.address.trim()) {
+    addressError.value = 'Address is required';
+    return false;
+  }
+  addressError.value = '';
+  return true;
+};
+
+const validateZipCode = () => {
+  if (!form.value.zipCode.trim()) {
+    zipCodeError.value = 'ZIP code is required';
+    return false;
+  }
+  // Basic ZIP code validation for European format
+  const zipRegex = /^\d{4,5}$/;
+  if (!zipRegex.test(form.value.zipCode)) {
+    zipCodeError.value = 'Please enter a valid ZIP code';
+    return false;
+  }
+  zipCodeError.value = '';
+  return true;
+};
+
+const validateCity = () => {
+  if (!form.value.city.trim()) {
+    cityError.value = 'City is required';
+    return false;
+  }
+  cityError.value = '';
+  return true;
+};
+
+const validateCountry = () => {
+  if (!form.value.country) {
+    countryError.value = 'Country is required';
+    return false;
+  }
+  countryError.value = '';
+  return true;
+};
+
 const isFormValid = computed(() => {
-  return validateFirstName() && validateLastName() && validateEmail();
+  return validateFirstName() && 
+         validateLastName() && 
+         validateEmail() && 
+         validateAddress() && 
+         validateZipCode() && 
+         validateCity() && 
+         validateCountry();
 });
 
 const submitOrder = async (): Promise<void> => {
@@ -215,13 +328,16 @@ const submitOrder = async (): Promise<void> => {
       customer: {
         firstName: form.value.firstName,
         lastName: form.value.lastName,
-        email: form.value.email
+        email: form.value.email,
+        address: form.value.address,
+        zipCode: form.value.zipCode,
+        city: form.value.city,
+        country: form.value.country
       },
       items: cartStore.items.map(item => ({
         sku: item.sku,
         quantity: item.quantity
-      })),
-      paymentMethod: form.value.paymentMethod as 'pay_now' | 'pay_in_store'
+      }))
     };
 
     await createOrder(order);
@@ -231,8 +347,7 @@ const submitOrder = async (): Promise<void> => {
     router.push({
       name: 'order-success',
       params: {
-        orderNumber: order.orderNumber,
-        paymentMethod: form.value.paymentMethod === 'pay_now' ? 'Pay Now' : 'Pay in Store'
+        orderNumber: order.orderNumber
       }
     });
   } catch (error) {
@@ -243,6 +358,26 @@ const submitOrder = async (): Promise<void> => {
   } finally {
     isSubmitting.value = false;
   }
+};
+
+const fillTestData = () => {
+  form.value = {
+    firstName: 'John',
+    lastName: 'Doe',
+    email: 'john.doe@example.com',
+    address: 'Bahnhofstrasse 1',
+    zipCode: '8001',
+    city: 'Zürich',
+    country: 'CH'
+  };
+  // Trigger validation
+  validateFirstName();
+  validateLastName();
+  validateEmail();
+  validateAddress();
+  validateZipCode();
+  validateCity();
+  validateCountry();
 };
 </script>
 
@@ -428,46 +563,42 @@ h1 {
   opacity: 0.7;
 }
 
-.payment-options {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  margin-top: 0.5rem;
-}
-
-.payment-option {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  cursor: pointer;
-  padding: 1rem;
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
-  transition: all 0.3s ease;
+.payment-info {
   background-color: var(--background-dark);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  text-align: left;
 }
 
-.payment-option input[type="radio"] {
-  width: 1.2rem;
-  height: 1.2rem;
-  accent-color: var(--primary-color);
-  margin: 0;
-}
-
-.payment-label {
+.payment-info h3 {
   color: var(--text-color);
-  font-weight: 500;
-  font-size: 1.1rem;
-  transition: all 0.3s ease;
-  cursor: pointer;
-  line-height: 1;
-  position: relative;
-  top: 3px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 0 0 1rem 0;
+  text-align: left;
 }
 
-.payment-option input[type="radio"]:checked ~ .payment-option {
-  border-color: var(--primary-color);
-  background-color: rgba(var(--primary-color-rgb), 0.1);
+.payment-info p {
+  color: var(--text-secondary);
+  margin: 0 0 0.5rem 0;
+  text-align: left;
+}
+
+.payment-info ul {
+  color: var(--text-secondary);
+  margin: 0;
+  padding-left: 1.5rem;
+  text-align: left;
+}
+
+.payment-info li {
+  margin-bottom: 0.5rem;
+  text-align: left;
+}
+
+.payment-info li:last-child {
+  margin-bottom: 0;
 }
 
 @media (max-width: 768px) {
@@ -484,6 +615,11 @@ h1 {
   }
 
   .name-fields {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .address-fields {
     grid-template-columns: 1fr;
     gap: 0;
   }
@@ -545,5 +681,52 @@ h1 {
   grid-template-columns: 1fr 1fr;
   gap: 1rem;
   margin-bottom: 1.5rem;
+}
+
+.address-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+select {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  transition: border-color 0.2s;
+  background-color: white;
+  cursor: pointer;
+}
+
+select:focus {
+  outline: none;
+  border-color: var(--primary-color);
+}
+
+select.error {
+  border-color: #dc3545;
+}
+
+.fill-test-data-btn {
+  width: 100%;
+  background-color: var(--background-dark);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  padding: 0.75rem;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 1rem;
+}
+
+.fill-test-data-btn:hover {
+  background-color: var(--border-color);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 </style> 
