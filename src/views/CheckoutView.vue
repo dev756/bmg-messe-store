@@ -340,7 +340,7 @@ const submitOrder = async (): Promise<void> => {
       }))
     };
 
-    await createOrder(order);
+    const { paymentUrl } = await createOrder(order);
     
     // Clear cart and redirect to success page
     cartStore.clearCart();
@@ -348,6 +348,9 @@ const submitOrder = async (): Promise<void> => {
       name: 'order-success',
       params: {
         orderNumber: order.orderNumber
+      },
+      query: {
+        paymentUrl: paymentUrl
       }
     });
   } catch (error) {

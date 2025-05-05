@@ -227,18 +227,32 @@ h1 {
 }
 
 .remove-btn {
-  background-color: transparent;
-  color: #ff4444;
-  border: 1px solid #ff4444;
+  background-color: var(--background-dark);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
   padding: 0.5rem 1rem;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s ease;
+  font-size: 0.9rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .remove-btn:hover {
   background-color: #ff4444;
-  color: var(--background-dark);
+  color: white;
+  border-color: #ff4444;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(255, 68, 68, 0.2);
+}
+
+.remove-btn::before {
+  content: "×";
+  font-size: 1.2rem;
+  font-weight: 600;
 }
 
 .cart-summary {
@@ -302,6 +316,11 @@ h1 {
   .item-total,
   .remove-btn {
     grid-column: 2;
+  }
+
+  .remove-btn {
+    margin-top: 0.5rem;
+    justify-content: center;
   }
 
   .cart-summary {

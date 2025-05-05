@@ -12,10 +12,15 @@
       <PaymentQRCode 
         :order-number="orderNumber"
         :amount="totalAmount"
+        :payment-url="paymentUrl"
         class="payment-section"
       />
 
-      <router-link to="/" class="continue-shopping">
+      <router-link 
+        to="/" 
+        class="continue-shopping"
+        @click="clearOrderData"
+      >
         Continue Shopping
       </router-link>
     </div>
@@ -24,17 +29,29 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import PaymentQRCode from '../components/PaymentQRCode.vue';
 
 const route = useRoute();
+const router = useRouter();
 const orderNumber = ref(typeof route.params.orderNumber === 'string' ? route.params.orderNumber : '');
 const totalAmount = ref(0);
+const paymentUrl = ref(typeof route.query.paymentUrl === 'string' ? route.query.paymentUrl : '');
+
+const clearOrderData = () => {
+  // Clear the current route data
+  orderNumber.value = '';
+  totalAmount.value = 0;
+  paymentUrl.value = '';
+  
+  // Replace the current history entry with a clean one
+  router.replace({ name: 'home' });
+};
 
 onMounted(async () => {
   try {
     // TODO: Replace with actual API call to get order details
-    // This is a placeholder that sets a dummy amount
+    // This is a placeholder that sets dummy values
     totalAmount.value = 99.99;
   } catch (error) {
     console.error('Failed to fetch order details:', error);

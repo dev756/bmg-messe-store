@@ -21,10 +21,12 @@ export async function fetchProducts(): Promise<Product[]> {
   }
 }
 
-export async function createOrder(orderData: any): Promise<{ orderNumber: string }> {
+export async function createOrder(orderData: any): Promise<{ paymentUrl: string }> {
   if (USE_MOCK_API) {
-    const orderNumber = await mockCreateOrder(orderData);
-    return { orderNumber };
+    await mockCreateOrder(orderData);
+    return { 
+      paymentUrl: `https://example.com/payment/${orderData.orderNumber}`
+    };
   }
 
   try {
@@ -38,6 +40,9 @@ export async function createOrder(orderData: any): Promise<{ orderNumber: string
     formData.append('zipCode', orderData.customer.zipCode);
     formData.append('address', orderData.customer.address);
     formData.append('country', orderData.customer.country);
+    if(orderData.transactionId) {
+      formData.append('transactionId', orderData.transactionId);
+    }
     
     // Add line items
     orderData.items.forEach((item, index) => {
@@ -54,7 +59,10 @@ export async function createOrder(orderData: any): Promise<{ orderNumber: string
       throw new Error('Failed to create order');
     }
     
-    return { orderNumber: orderData.orderNumber };
+    const data = await response.json();
+    return { 
+      paymentUrl: data.paymentUrl || `${API_BASE_URL}/payment/${orderData.orderNumber}`
+    };
   } catch (error) {
     console.error('Error creating order:', error);
     throw error;
