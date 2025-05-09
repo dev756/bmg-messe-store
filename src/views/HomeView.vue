@@ -251,6 +251,7 @@ h1 {
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  min-height: 2.6em; /* Ensures consistent height for 2 lines */
 }
 
 .product-details {
@@ -258,6 +259,7 @@ h1 {
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
+  padding-top: 0.5rem;
 }
 
 .price {
