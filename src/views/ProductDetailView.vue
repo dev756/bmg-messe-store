@@ -15,7 +15,7 @@
         <p class="price">CHF {{ product.price.toFixed(2) }}</p>
         <div class="description" v-html="product.description"></div>
         <p class="stock" :class="{ 'low-stock': (product.stockLevel ?? 0) <= 5 }">
-          {{ (product.stockLevel ?? 0) === 0 ? 'Leider kein Bestand mehr' : `${product.stockLevel ?? 0} auf Lager` }}
+          {{ (product.stockLevel ?? 0) === 0 ? 'Leider kein Bestand mehr' : (product.stockLevel ?? 0) <= 5 ? 'Nur noch wenige verfügbar' : 'Auf Lager' }}
         </p>
         <button
           class="add-to-cart"

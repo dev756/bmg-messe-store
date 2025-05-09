@@ -22,20 +22,27 @@ export const useProductStore = defineStore('products', () => {
   }, { deep: true });
 
   async function loadProducts() {
-    // Only fetch from API if we don't have products in localStorage
-    if (products.value.length === 0) {
-      isLoading.value = true;
-      error.value = null;
-      
-      try {
-        const fetchedProducts = await fetchProducts();
-        products.value = fetchedProducts;
-      } catch (e) {
-        error.value = 'Failed to load products';
-        console.error('Error loading products:', e);
-      } finally {
-        isLoading.value = false;
-      }
+    isLoading.value = true;
+    error.value = null;
+    
+    try {
+      const fetchedProducts = await fetchProducts();
+      products.value = fetchedProducts;
+    } catch (e) {
+      error.value = 'Failed to load products';
+      console.error('Error loading products:', e);
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  // Background refresh that only updates localStorage
+  async function refreshProductsInBackground() {
+    try {
+      const fetchedProducts = await fetchProducts();
+      localStorage.setItem(PRODUCTS_STORAGE_KEY, JSON.stringify(fetchedProducts));
+    } catch (e) {
+      console.error('Error refreshing products:', e);
     }
   }
 
@@ -55,6 +62,7 @@ export const useProductStore = defineStore('products', () => {
     isLoading,
     error,
     loadProducts,
+    refreshProductsInBackground,
     updateStockLevel,
     getProduct
   };

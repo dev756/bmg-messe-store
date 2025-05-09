@@ -120,10 +120,15 @@ function addToCart(product: Product, event: MouseEvent) {
 }
 
 onMounted(async () => {
+  // Load products from localStorage
   await productStore.loadProducts();
-  // Refresh products every minute
+  
+  // Trigger immediate background refresh
+  productStore.refreshProductsInBackground();
+  
+  // Start background refresh interval
   refreshInterval = window.setInterval(() => {
-    productStore.loadProducts();
+    productStore.refreshProductsInBackground();
   }, 60000); // 60000 ms = 1 minute
 });
 
