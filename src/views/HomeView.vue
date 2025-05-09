@@ -22,18 +22,18 @@
             <h2 class="product-name">{{ product.name }}</h2>
             <div class="product-details">
               <p class="price">CHF {{ product.price.toFixed(2) }}</p>
-              <p class="stock" :class="{ 'low-stock': product.stockLevel <= 5 }">
-                {{ product.stockLevel <= 5 ? 'Nur noch ' + product.stockLevel + ' verfügbar' : 'Auf Lager' }}
+              <p class="stock" :class="{ 'low-stock': (product.stockLevel ?? 0) <= 5 }">
+                {{ (product.stockLevel ?? 0) === 0 ? 'Leider kein Bestand mehr' : (product.stockLevel ?? 0) <= 5 ? 'Nur noch ' + (product.stockLevel ?? 0) + ' verfügbar' : 'Auf Lager' }}
               </p>
             </div>
           </div>
         </router-link>
         <button
           class="add-to-cart"
-          :disabled="product.stockLevel === 0"
+          :disabled="(product.stockLevel ?? 0) === 0"
           @click="addToCart(product, $event)"
         >
-          {{ product.stockLevel === 0 ? 'Ausverkauft' : 'In den Warenkorb' }}
+          {{ (product.stockLevel ?? 0) === 0 ? 'Leider ausverkauft' : 'In den Warenkorb' }}
         </button>
       </div>
     </div>
@@ -192,6 +192,8 @@ h1 {
   transition: transform 0.3s ease;
   display: flex;
   flex-direction: column;
+  width: 100%;
+  height: 100%;
   max-width: 200px;
   margin: 0 auto;
 }
@@ -212,6 +214,7 @@ h1 {
   width: 100%;
   padding-top: 100%;
   overflow: hidden;
+  background-color: white;
 }
 
 .product-image img {
@@ -220,8 +223,9 @@ h1 {
   left: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   transition: transform 0.3s ease;
+  padding: 0.5rem;
 }
 
 .product-card:hover .product-image img {
@@ -234,6 +238,7 @@ h1 {
   flex-direction: column;
   flex-grow: 1;
   min-height: 80px;
+  background-color: var(--background-light);
 }
 
 .product-name {

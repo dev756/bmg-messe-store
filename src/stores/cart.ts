@@ -29,7 +29,8 @@ export const useCartStore = defineStore('cart', () => {
   function canAddToCart(product: Product): boolean {
     const existingItem = items.value.find(item => item.sku === product.sku);
     const currentQuantity = existingItem ? existingItem.quantity : 0;
-    return currentQuantity < product.stockLevel;
+    const stockLevel = product.stockLevel ?? 0;
+    return currentQuantity < stockLevel;
   }
 
   function addToCart(product: Product): boolean {
@@ -56,8 +57,11 @@ export const useCartStore = defineStore('cart', () => {
 
   function updateQuantity(sku: string, quantity: number) {
     const item = items.value.find(item => item.sku === sku);
-    if (item && quantity > 0 && quantity <= item.stockLevel) {
-      item.quantity = quantity;
+    if (item && quantity > 0) {
+      const stockLevel = item.stockLevel ?? 0;
+      if (quantity <= stockLevel) {
+        item.quantity = quantity;
+      }
     }
   }
 

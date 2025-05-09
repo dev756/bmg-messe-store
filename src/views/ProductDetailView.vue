@@ -14,8 +14,8 @@
         <h1>{{ product.name }}</h1>
         <p class="price">CHF {{ product.price.toFixed(2) }}</p>
         <div class="description" v-html="product.description"></div>
-        <p class="stock" :class="{ 'low-stock': product.stockLevel <= 5 }">
-          {{ product.stockLevel === 0 ? 'Ausverkauft' : `${product.stockLevel} auf Lager` }}
+        <p class="stock" :class="{ 'low-stock': (product.stockLevel ?? 0) <= 5 }">
+          {{ (product.stockLevel ?? 0) === 0 ? 'Leider kein Bestand mehr' : `${product.stockLevel ?? 0} auf Lager` }}
         </p>
         <button
           class="add-to-cart"
@@ -79,7 +79,7 @@ const canAddToCart = computed(() => {
 
 const buttonText = computed(() => {
   if (!product.value) return 'Hinzufügen';
-  if (product.value.stockLevel === 0) return 'Ausverkauft';
+  if ((product.value.stockLevel ?? 0) === 0) return 'Leider ausverkauft';
   const currentQuantity = cartStore.items.find(item => item.sku === product.value?.sku)?.quantity || 0;
   return currentQuantity > 0 ? `+1 hinzufügen (${currentQuantity} im Warenkorb)` : 'Hinzufügen';
 });
