@@ -157,7 +157,7 @@
           </div>
 
           <button 
-            v-if="isDev" 
+            v-if="isDev || showTestData" 
             type="button" 
             class="fill-test-data-btn"
             @click="fillTestData"
@@ -198,6 +198,7 @@ const toastMessage = ref('');
 const toastType = ref<'success' | 'error'>('error');
 
 const isDev = ref(import.meta.env.MODE === 'development');
+const showTestData = ref(import.meta.env.VITE_SHOW_TEST_DATA === 'true');
 
 const form = ref({
   firstName: '',
