@@ -1,22 +1,22 @@
 <template>
   <div class="checkout">
-    <h1>Checkout</h1>
+    <h1>Bestellabschluss</h1>
     
     <div v-if="cartStore.items.length === 0" class="empty-cart">
-      <p>Your cart is empty</p>
-      <router-link to="/" class="continue-shopping">Continue Shopping</router-link>
+      <p>Der Warenkorb ist leer</p>
+      <router-link to="/" class="continue-shopping">Weiter einkaufen</router-link>
     </div>
     
     <div v-else class="checkout-content">
       <div v-if="isSubmitting" class="processing-overlay">
         <div class="processing-content">
           <div class="processing-spinner"></div>
-          <h2>Processing Your Order</h2>
-          <p>Please wait while we process your order...</p>
+          <h2>Bestellung wird verarbeitet</h2>
+          <p>Bitte warten Sie, während wir Ihre Bestellung verarbeiten...</p>
         </div>
       </div>
       <div class="order-summary">
-        <h2>Order Summary</h2>
+        <h2>Bestellübersicht</h2>
         <div class="cart-items">
           <div v-for="item in cartStore.items" :key="item.sku" class="cart-item">
             <div class="item-image">
@@ -24,7 +24,7 @@
             </div>
             <div class="item-details">
               <h3>{{ item.name }}</h3>
-              <p class="quantity">Quantity: {{ item.quantity }}</p>
+              <p class="quantity">Menge: {{ item.quantity }}</p>
             </div>
             <div class="item-price">
               CHF {{ item.price.toFixed(2) }}
@@ -34,7 +34,7 @@
         
         <div class="order-total">
           <div class="vat">
-            <span>Including VAT (8.1%)</span>
+            <span>Inkl. MwSt. (8.1%)</span>
             <span>CHF {{ (cartStore.totalPrice - cartStore.totalPrice / 1.081).toFixed(2) }}</span>
           </div>
           <div class="total">
@@ -49,28 +49,28 @@
         <form @submit.prevent="submitOrder">
           <div class="name-fields">
             <div class="form-group">
-              <label for="firstName">First Name</label>
+              <label for="firstName">Vorname</label>
               <input
                 type="text"
                 id="firstName"
                 v-model="form.firstName"
                 @blur="validateFirstName"
                 :class="{ 'error': firstNameError }"
-                placeholder="Enter your first name"
+                placeholder="Vornamen eingeben"
                 ref="firstNameInput"
               />
               <span class="error-message" v-if="firstNameError">{{ firstNameError }}</span>
             </div>
 
             <div class="form-group">
-              <label for="lastName">Last Name</label>
+              <label for="lastName">Nachname</label>
               <input
                 type="text"
                 id="lastName"
                 v-model="form.lastName"
                 @blur="validateLastName"
                 :class="{ 'error': lastNameError }"
-                placeholder="Enter your last name"
+                placeholder="Nachnamen eingeben"
               />
               <span class="error-message" v-if="lastNameError">{{ lastNameError }}</span>
             </div>
@@ -84,75 +84,75 @@
               v-model="form.email"
               @blur="validateEmail"
               :class="{ 'error': emailError }"
-              placeholder="Enter your email"
+              placeholder="Email eingeben"
             />
             <span class="error-message" v-if="emailError">{{ emailError }}</span>
           </div>
 
           <div class="form-group">
-            <label for="address">Address</label>
+            <label for="address">Adresse</label>
             <input
               type="text"
               id="address"
               v-model="form.address"
               @blur="validateAddress"
               :class="{ 'error': addressError }"
-              placeholder="Enter your street address"
+              placeholder="Straße und Nummer eingeben"
             />
             <span class="error-message" v-if="addressError">{{ addressError }}</span>
           </div>
 
           <div class="address-fields">
             <div class="form-group">
-              <label for="zipCode">ZIP Code</label>
+              <label for="zipCode">PLZ</label>
               <input
                 type="text"
                 id="zipCode"
                 v-model="form.zipCode"
                 @blur="validateZipCode"
                 :class="{ 'error': zipCodeError }"
-                placeholder="Enter ZIP code"
+                placeholder="PLZ eingeben"
               />
               <span class="error-message" v-if="zipCodeError">{{ zipCodeError }}</span>
             </div>
 
             <div class="form-group">
-              <label for="city">City</label>
+              <label for="city">Ort</label>
               <input
                 type="text"
                 id="city"
                 v-model="form.city"
                 @blur="validateCity"
                 :class="{ 'error': cityError }"
-                placeholder="Enter city"
+                placeholder="Ort eingeben"
               />
               <span class="error-message" v-if="cityError">{{ cityError }}</span>
             </div>
           </div>
 
           <div class="form-group">
-            <label for="country">Country</label>
+            <label for="country">Land</label>
             <select
               id="country"
               v-model="form.country"
               :class="{ 'error': countryError }"
             >
-              <option value="CH">Switzerland</option>
-              <option value="DE">Germany</option>
-              <option value="AT">Austria</option>
-              <option value="IT">Italy</option>
-              <option value="FR">France</option>
+              <option value="CH">Schweiz</option>
+              <option value="DE">Deutschland</option>
+              <option value="AT">Österreich</option>
+              <option value="IT">Italien</option>
+              <option value="FR">Frankreich</option>
               <option value="LI">Liechtenstein</option>
             </select>
             <span class="error-message" v-if="countryError">{{ countryError }}</span>
           </div>
 
           <div class="payment-info">
-            <h3>Payment Information</h3>
-            <p>You can pay for your order in two ways:</p>
+            <h3>Zahlungsinformationen</h3>
+            <p>Sie können Ihre Bestellung in zwei verschiedenen Weisen bezahlen:</p>
             <ul>
-              <li>Pay in store when picking up your order</li>
-              <li>Pay in advance using our mobile app (QR code will be shown after order confirmation)</li>
+              <li>Beim Abholen der Bestellung in der Filiale bezahlen</li>
+              <li>Vorab bezahlen mit unserer mobilen App (QR-Code wird nach Bestellbestätigung angezeigt)</li>
             </ul>
           </div>
 
@@ -162,11 +162,11 @@
             class="fill-test-data-btn"
             @click="fillTestData"
           >
-            Fill Test Data
+            Testdaten einfüllen
           </button>
           
           <button type="submit" class="place-order-btn" :disabled="isSubmitting || !isFormValid">
-            {{ isSubmitting ? 'Processing...' : 'Place Order' }}
+            {{ isSubmitting ? 'Verarbeitung...' : 'Bestellung aufgeben' }}
           </button>
         </form>
       </div>

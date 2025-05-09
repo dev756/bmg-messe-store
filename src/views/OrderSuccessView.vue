@@ -2,11 +2,11 @@
   <div class="order-success">
     <div class="success-content">
       <div class="success-icon">✓</div>
-      <h1>Order Confirmed!</h1>
-      <p class="message">Thank you for your order. We'll notify you when it's ready for pickup.</p>
+      <h1>Bestellung Bestätigt!</h1>
+      <p class="message">Vielen Dank für Ihre Bestellung. Wir benachrichtigen Sie, wenn sie zur Abholung bereit ist.</p>
       <div class="order-details">
-        <p>Order Number: {{ orderNumber }}</p>
-        <p>Total Amount: CHF {{ totalAmount.toFixed(2) }}</p>
+        <p>Bestellnummer: {{ orderNumber }}</p>
+        <p>Gesamtbetrag: CHF {{ totalAmount.toFixed(2) }}</p>
       </div>
 
       <PaymentQRCode 
@@ -21,7 +21,7 @@
         class="continue-shopping"
         @click="clearOrderData"
       >
-        Continue Shopping
+        Weiter Einkaufen
       </router-link>
     </div>
   </div>

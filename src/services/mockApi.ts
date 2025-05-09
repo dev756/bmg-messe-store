@@ -9,6 +9,78 @@ const mockProducts: Product[] = [
     imageUrl: 'https://kns-live.cdn.aboutyou.cloud/images/0eaadf582f30f10491e85fff3838ae35.jpg?brightness=1&impolicy=imdb-transparent-background&width=1160&height=1547&quality=75&bg=FFFFFF',
     stockLevel: 10
   },
+  {
+    sku: 'test',
+    name: 'Bergen Pro All Black',
+    price: 99.95,
+    description: '<b>The Classic watch</b> combines timeless design with modern functionality. Featuring a stainless steel case, sapphire crystal glass, and a premium leather strap.',
+    imageUrl: 'https://kns-live.cdn.aboutyou.cloud/images/0eaadf582f30f10491e85fff3838ae35.jpg?brightness=1&impolicy=imdb-transparent-background&width=1160&height=1547&quality=75&bg=FFFFFF',
+    stockLevel: 10
+  },
+  {
+    sku: 'test',
+    name: 'Bergen Pro All Black',
+    price: 99.95,
+    description: '<b>The Classic watch</b> combines timeless design with modern functionality. Featuring a stainless steel case, sapphire crystal glass, and a premium leather strap.',
+    imageUrl: 'https://kns-live.cdn.aboutyou.cloud/images/0eaadf582f30f10491e85fff3838ae35.jpg?brightness=1&impolicy=imdb-transparent-background&width=1160&height=1547&quality=75&bg=FFFFFF',
+    stockLevel: 10
+  },
+  {
+    sku: 'test',
+    name: 'Bergen Pro All Black',
+    price: 99.95,
+    description: '<b>The Classic watch</b> combines timeless design with modern functionality. Featuring a stainless steel case, sapphire crystal glass, and a premium leather strap.',
+    imageUrl: 'https://kns-live.cdn.aboutyou.cloud/images/0eaadf582f30f10491e85fff3838ae35.jpg?brightness=1&impolicy=imdb-transparent-background&width=1160&height=1547&quality=75&bg=FFFFFF',
+    stockLevel: 10
+  },
+  {
+    sku: 'test',
+    name: 'Bergen Pro All Black',
+    price: 99.95,
+    description: '<b>The Classic watch</b> combines timeless design with modern functionality. Featuring a stainless steel case, sapphire crystal glass, and a premium leather strap.',
+    imageUrl: 'https://kns-live.cdn.aboutyou.cloud/images/0eaadf582f30f10491e85fff3838ae35.jpg?brightness=1&impolicy=imdb-transparent-background&width=1160&height=1547&quality=75&bg=FFFFFF',
+    stockLevel: 10
+  },
+  {
+    sku: 'test',
+    name: 'Bergen Pro All Black',
+    price: 99.95,
+    description: '<b>The Classic watch</b> combines timeless design with modern functionality. Featuring a stainless steel case, sapphire crystal glass, and a premium leather strap.',
+    imageUrl: 'https://kns-live.cdn.aboutyou.cloud/images/0eaadf582f30f10491e85fff3838ae35.jpg?brightness=1&impolicy=imdb-transparent-background&width=1160&height=1547&quality=75&bg=FFFFFF',
+    stockLevel: 10
+  },
+  {
+    sku: 'test',
+    name: 'Bergen Pro All Black',
+    price: 99.95,
+    description: '<b>The Classic watch</b> combines timeless design with modern functionality. Featuring a stainless steel case, sapphire crystal glass, and a premium leather strap.',
+    imageUrl: 'https://kns-live.cdn.aboutyou.cloud/images/0eaadf582f30f10491e85fff3838ae35.jpg?brightness=1&impolicy=imdb-transparent-background&width=1160&height=1547&quality=75&bg=FFFFFF',
+    stockLevel: 10
+  },
+  {
+    sku: 'test',
+    name: 'Bergen Pro All Black',
+    price: 99.95,
+    description: '<b>The Classic watch</b> combines timeless design with modern functionality. Featuring a stainless steel case, sapphire crystal glass, and a premium leather strap.',
+    imageUrl: 'https://kns-live.cdn.aboutyou.cloud/images/0eaadf582f30f10491e85fff3838ae35.jpg?brightness=1&impolicy=imdb-transparent-background&width=1160&height=1547&quality=75&bg=FFFFFF',
+    stockLevel: 10
+  },
+  {
+    sku: 'test',
+    name: 'Bergen Pro All Black',
+    price: 99.95,
+    description: '<b>The Classic watch</b> combines timeless design with modern functionality. Featuring a stainless steel case, sapphire crystal glass, and a premium leather strap.',
+    imageUrl: 'https://kns-live.cdn.aboutyou.cloud/images/0eaadf582f30f10491e85fff3838ae35.jpg?brightness=1&impolicy=imdb-transparent-background&width=1160&height=1547&quality=75&bg=FFFFFF',
+    stockLevel: 10
+  },
+  {
+    sku: 'test',
+    name: 'Bergen Pro All Black',
+    price: 99.95,
+    description: '<b>The Classic watch</b> combines timeless design with modern functionality. Featuring a stainless steel case, sapphire crystal glass, and a premium leather strap.',
+    imageUrl: 'https://kns-live.cdn.aboutyou.cloud/images/0eaadf582f30f10491e85fff3838ae35.jpg?brightness=1&impolicy=imdb-transparent-background&width=1160&height=1547&quality=75&bg=FFFFFF',
+    stockLevel: 10
+  },
   /*
   {
     sku: 'ks-002',

@@ -1,22 +1,22 @@
 <template>
   <div class="payment-qr">
-    <h3>Pay with QR Code</h3>
+    <h3>Mit QR-Code bezahlen</h3>
     <div class="qr-container">
       <div v-if="qrCodeUrl" class="qr-code">
-        <img :src="qrCodeUrl" alt="Payment QR Code" />
+        <img :src="qrCodeUrl" alt="Zahlungs-QR-Code" />
       </div>
       <div v-else class="qr-placeholder">
         <div class="loading-spinner"></div>
-        <p>Generating QR code...</p>
+        <p>QR-Code wird generiert...</p>
       </div>
     </div>
     <div class="payment-details">
       <div class="amount">
-        <span>Amount to pay:</span>
+        <span>Zu bezahlender Betrag:</span>
         <span class="price">CHF {{ amount.toFixed(2) }}</span>
       </div>
       <p class="instructions">
-        Scan this QR-Code with your phone to proceed to payment
+        Scannen Sie diesen QR-Code mit Ihrem Smartphone, um zur Zahlung zu gelangen
       </p>
       <a 
         v-if="showPaymentLink" 
@@ -24,7 +24,7 @@
         target="_blank" 
         class="payment-link"
       >
-        Pay Now
+        Jetzt Bezahlen
       </a>
     </div>
   </div>

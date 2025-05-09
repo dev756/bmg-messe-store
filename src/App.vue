@@ -51,7 +51,7 @@ onMounted(async () => {
         </router-link>
         <div class="nav-links">
           <router-link to="/cart" class="cart-link">
-            Cart ({{ totalItems || 0 }})
+            Warenkorb ({{ totalItems || 0 }})
           </router-link>
         </div>
       </nav>

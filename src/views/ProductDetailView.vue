@@ -1,7 +1,7 @@
 <template>
   <div class="product-detail">
     <div v-if="productStore.isLoading" class="loading">
-      Loading product details...
+      Produktdetails laden...
     </div>
     <div v-else-if="productStore.error" class="error">
       {{ productStore.error }}
@@ -15,20 +15,27 @@
         <p class="price">CHF {{ product.price.toFixed(2) }}</p>
         <div class="description" v-html="product.description"></div>
         <p class="stock" :class="{ 'low-stock': product.stockLevel <= 5 }">
-          {{ product.stockLevel === 0 ? 'Out of Stock' : `${product.stockLevel} in stock` }}
+          {{ product.stockLevel === 0 ? 'Ausverkauft' : `${product.stockLevel} auf Lager` }}
         </p>
         <button
           class="add-to-cart"
           :disabled="!canAddToCart"
-          @click="addToCart"
+          @click="addToCart($event)"
         >
           {{ buttonText }}
         </button>
       </div>
     </div>
     <div v-else class="error">
-      Product not found
+      Produkt nicht gefunden
     </div>
+    <AddToCartAnimation
+      v-if="showAnimation && product"
+      :image-url="product.imageUrl"
+      :product-name="product.name"
+      :start-position="animationStart"
+      :end-position="animationEnd"
+    />
     <Toast
       v-if="showToast"
       :message="toastMessage"
@@ -44,6 +51,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { useCartStore } from '../stores/cart';
 import { useProductStore } from '../stores/products';
 import Toast from '../components/Toast.vue';
+import AddToCartAnimation from '../components/AddToCartAnimation.vue';
 import type { Product } from '../types';
 
 const route = useRoute();
@@ -53,6 +61,11 @@ const productStore = useProductStore();
 const showToast = ref(false);
 const toastMessage = ref('');
 const toastType = ref<'success' | 'error'>('success');
+
+// Animation state
+const showAnimation = ref(false);
+const animationStart = ref({ x: 0, y: 0 });
+const animationEnd = ref({ x: 0, y: 0 });
 
 const product = computed(() => {
   const sku = route.params.sku as string;
@@ -65,10 +78,10 @@ const canAddToCart = computed(() => {
 });
 
 const buttonText = computed(() => {
-  if (!product.value) return 'Add to Cart';
-  if (product.value.stockLevel === 0) return 'Out of Stock';
+  if (!product.value) return 'Hinzufügen';
+  if (product.value.stockLevel === 0) return 'Ausverkauft';
   const currentQuantity = cartStore.items.find(item => item.sku === product.value?.sku)?.quantity || 0;
-  return currentQuantity > 0 ? `Add Another (${currentQuantity} in cart)` : 'Add to Cart';
+  return currentQuantity > 0 ? `+1 hinzufügen (${currentQuantity} im Warenkorb)` : 'Hinzufügen';
 });
 
 onMounted(async () => {
@@ -83,14 +96,45 @@ onMounted(async () => {
   }
 });
 
-function addToCart() {
+function addToCart(event: MouseEvent) {
   if (product.value) {
     const success = cartStore.addToCart(product.value);
     if (success) {
-      toastMessage.value = `${product.value.name} added to cart`;
+      // Get the button position
+      const button = event.currentTarget as HTMLElement;
+      const buttonRect = button.getBoundingClientRect();
+      
+      // Get the cart icon position (assuming it's in the header)
+      const cartIcon = document.querySelector('.cart-icon') as HTMLElement;
+      const cartRect = cartIcon?.getBoundingClientRect() || { 
+        left: window.innerWidth - 100, 
+        top: 20,
+        width: 40,
+        height: 40
+      };
+
+      // Set animation positions
+      animationStart.value = {
+        x: buttonRect.left + buttonRect.width / 2 - 30,
+        y: buttonRect.top + buttonRect.height / 2 - 30
+      };
+      animationEnd.value = {
+        x: cartRect.left + cartRect.width / 2 - 30,
+        y: cartRect.top + cartRect.height / 2 - 30
+      };
+
+      // Start animation
+      showAnimation.value = true;
+
+      // Reset animation after it completes
+      setTimeout(() => {
+        showAnimation.value = false;
+      }, 800);
+
+      toastMessage.value = `${product.value.name} zum Warenkorb hinzugefügt`;
       toastType.value = 'success';
     } else {
-      toastMessage.value = 'Cannot add more items than available in stock';
+      toastMessage.value = 'Kann nicht mehr hinzufügen als im Lager vorhanden';
       toastType.value = 'error';
     }
     showToast.value = true;

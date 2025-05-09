@@ -1,20 +1,20 @@
 <template>
   <div class="password-screen">
     <div class="password-container">
-      <h1>Enter Password</h1>
+      <h1>Passwortgeschützt</h1>
       <form @submit.prevent="checkPassword" class="password-form">
         <div class="form-group">
           <input
             type="password"
             v-model="password"
-            placeholder="Enter password"
+            placeholder="Passwort"
             :class="{ 'error': error }"
             autofocus
           />
           <span class="error-message" v-if="error">{{ error }}</span>
         </div>
         <button type="submit" :disabled="isLoading">
-          {{ isLoading ? 'Checking...' : 'Enter' }}
+          {{ isLoading ? 'Prüfe...' : 'Einloggen' }}
         </button>
       </form>
     </div>

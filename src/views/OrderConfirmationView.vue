@@ -2,33 +2,33 @@
   <div class="order-confirmation">
     <div class="confirmation-card">
       <div class="success-icon">✓</div>
-      <h1>Order Confirmed!</h1>
-      <p class="order-number">Order #{{ orderNumber }}</p>
+      <h1>Bestellung bestätigt!</h1>
+      <p class="order-number">Bestellnummer #{{ orderNumber }}</p>
       
       <div class="confirmation-details">
         <div class="detail-section">
-          <h2>Payment Information</h2>
+          <h2>Zahlungsinformationen</h2>
           <p class="payment-method">
-            Payment Method: {{ paymentMethodDisplay }}
+            Zahlungsmethode: {{ paymentMethodDisplay }}
           </p>
         </div>
         
         <div class="detail-section">
-          <h2>What's Next?</h2>
+          <h2>Was passiert als nächstes?</h2>
           <p v-if="paymentMethod === 'cash'">
-            Please have the exact amount ready when your order arrives.
+            Sie können Ihre Bestellung bei Abholung bezahlen oder beim Bezahlen mit unserer mobilen App.
           </p>
           <p v-else>
-            Your payment has been processed successfully.
+            Ihre Zahlung wurde erfolgreich verarbeitet.
           </p>
           <p class="delivery-info">
-            We'll notify you when your order is ready for pickup or delivery.
+            Wir werden Sie benachrichtigen, wenn Ihre Bestellung abgeholt oder geliefert werden kann.
           </p>
         </div>
       </div>
       
       <router-link to="/" class="continue-shopping">
-        Continue Shopping
+        Weiter einkaufen
       </router-link>
     </div>
   </div>

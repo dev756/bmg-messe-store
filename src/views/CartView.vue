@@ -1,10 +1,10 @@
 <template>
   <div class="cart">
-    <h1>Shopping Cart</h1>
+    <h1>Warenkorb</h1>
     
     <div v-if="cartStore.items.length === 0" class="empty-cart">
-      <p>Your cart is empty</p>
-      <router-link to="/" class="continue-shopping">Continue Shopping</router-link>
+      <p>Der Warenkorb ist leer</p>
+      <router-link to="/" class="continue-shopping">Weiter einkaufen</router-link>
     </div>
     
     <div v-else class="cart-content">
@@ -34,16 +34,16 @@
             CHF {{ (item.price * item.quantity).toFixed(2) }}
           </div>
           <button @click="cartStore.removeFromCart(item.sku)" class="remove-btn">
-            Remove
+            Entfernen
           </button>
         </div>
       </div>
       
       <div class="cart-summary">
-        <h2>Order Summary</h2>
+        <h2>Zusammenfassung</h2>
         <div class="order-total">
           <div class="vat">
-            <span>Including VAT (8.1%)</span>
+            <span>Inkl. MwSt. (8.1%)</span>
             <span>CHF {{ (cartStore.totalPrice - cartStore.totalPrice / 1.081).toFixed(2) }}</span>
           </div>
           <div class="total">
@@ -52,7 +52,7 @@
           </div>
         </div>
         <router-link to="/checkout" class="checkout-btn">
-          Proceed to Checkout
+          Weiter zur Kasse
         </router-link>
       </div>
     </div>
@@ -227,9 +227,9 @@ h1 {
 }
 
 .remove-btn {
-  background-color: var(--background-dark);
-  color: var(--text-secondary);
-  border: 1px solid var(--border-color);
+  background-color: #e57373;
+  color: white;
+  border: 1px solid #e57373;
   padding: 0.5rem 1rem;
   border-radius: 6px;
   cursor: pointer;
@@ -242,11 +242,10 @@ h1 {
 }
 
 .remove-btn:hover {
-  background-color: #ff4444;
-  color: white;
-  border-color: #ff4444;
+  background-color: #ef9a9a;
+  border-color: #ef9a9a;
   transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(255, 68, 68, 0.2);
+  box-shadow: 0 2px 8px rgba(229, 115, 115, 0.2);
 }
 
 .remove-btn::before {
@@ -312,15 +311,33 @@ h1 {
     gap: 1rem;
   }
 
-  .quantity-controls,
-  .item-total,
-  .remove-btn {
+  .item-image {
+    grid-row: 1;
+    grid-column: 1;
+  }
+
+  .item-details {
+    grid-row: 1;
     grid-column: 2;
   }
 
-  .remove-btn {
-    margin-top: 0.5rem;
+  .quantity-controls {
+    grid-row: 2;
+    grid-column: 1 / -1;
     justify-content: center;
+    margin: 0.5rem 0;
+  }
+
+  .item-total {
+    grid-row: 3;
+    grid-column: 1;
+    text-align: left;
+  }
+
+  .remove-btn {
+    grid-row: 3;
+    grid-column: 2;
+    justify-self: end;
   }
 
   .cart-summary {
