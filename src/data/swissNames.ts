@@ -35,9 +35,19 @@ export function getNextName() {
   firstNameIndex = (firstNameIndex + 1) % firstNames.length;
   lastNameIndex = (lastNameIndex + 1) % lastNames.length;
   
+  // Replace umlauts in email
+  const emailFirstName = firstName.toLowerCase()
+    .replace('ä', 'ae')
+    .replace('ö', 'oe')
+    .replace('ü', 'ue');
+  const emailLastName = lastName.toLowerCase()
+    .replace('ä', 'ae')
+    .replace('ö', 'oe')
+    .replace('ü', 'ue');
+  
   return {
     firstName,
     lastName,
-    email: `${firstName.toLowerCase()}.${lastName.toLowerCase()}@actindo.com`
+    email: `${emailFirstName}.${emailLastName}@actindo.com`
   };
 } 

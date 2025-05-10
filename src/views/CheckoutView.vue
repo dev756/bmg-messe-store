@@ -47,6 +47,15 @@
       <div class="checkout-form">
         <h2>Contact Information</h2>
         <form @submit.prevent="submitOrder">
+          <button 
+            v-if="isDev || showTestData" 
+            type="button" 
+            class="fill-test-data-btn"
+            @click="fillTestData"
+          >
+            Testdaten einfüllen
+          </button>
+
           <div class="name-fields">
             <div class="form-group">
               <label for="firstName">Vorname</label>
@@ -155,15 +164,6 @@
               <li>Vorab bezahlen mit unserer mobilen App (QR-Code wird nach Bestellbestätigung angezeigt)</li>
             </ul>
           </div>
-
-          <button 
-            v-if="isDev || showTestData" 
-            type="button" 
-            class="fill-test-data-btn"
-            @click="fillTestData"
-          >
-            Testdaten einfüllen
-          </button>
           
           <button type="submit" class="place-order-btn" :disabled="isSubmitting || !isFormValid">
             {{ isSubmitting ? 'Verarbeitung...' : 'Bestellung aufgeben' }}
@@ -188,6 +188,7 @@ import { useProductStore } from '../stores/products';
 import type { Order, Customer } from '../types';
 import Toast from '../components/Toast.vue';
 import { createOrder } from '../services/api';
+import { getNextName } from '../data/swissNames';
 
 const router = useRouter();
 const cartStore = useCartStore();
@@ -343,6 +344,9 @@ const submitOrder = async (): Promise<void> => {
 
     const { paymentUrl } = await createOrder(order);
     
+    // Store total amount before clearing cart
+    const totalAmount = cartStore.totalPrice;
+    
     // Clear cart and redirect to success page
     cartStore.clearCart();
     router.push({
@@ -352,7 +356,7 @@ const submitOrder = async (): Promise<void> => {
       },
       query: {
         paymentUrl: paymentUrl,
-        totalAmount: cartStore.totalPrice.toString()
+        totalAmount: totalAmount.toString()
       }
     });
   } catch (error) {
@@ -366,10 +370,11 @@ const submitOrder = async (): Promise<void> => {
 };
 
 const fillTestData = () => {
+  const { firstName, lastName, email } = getNextName();
   form.value = {
-    firstName: 'John',
-    lastName: 'Doe',
-    email: 'john.doe@example.com',
+    firstName,
+    lastName,
+    email,
     address: 'Bahnhofstrasse 1',
     zipCode: '8001',
     city: 'Zürich',
@@ -717,21 +722,24 @@ select.error {
 
 .fill-test-data-btn {
   width: 100%;
-  background-color: var(--background-dark);
-  color: var(--text-color);
-  border: 1px solid var(--border-color);
-  padding: 0.75rem;
+  background-color: var(--primary-color);
+  color: var(--background-dark);
+  border: none;
+  padding: 1rem;
   border-radius: 6px;
-  font-size: 1rem;
+  font-size: 1.1rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .fill-test-data-btn:hover {
-  background-color: var(--border-color);
+  background-color: var(--text-secondary);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 </style> 
