@@ -35,7 +35,7 @@ import PaymentQRCode from '../components/PaymentQRCode.vue';
 const route = useRoute();
 const router = useRouter();
 const orderNumber = ref(typeof route.params.orderNumber === 'string' ? route.params.orderNumber : '');
-const totalAmount = ref(0);
+const totalAmount = ref(parseFloat(route.query.totalAmount as string) || 0);
 const paymentUrl = ref(typeof route.query.paymentUrl === 'string' ? route.query.paymentUrl : '');
 
 const clearOrderData = () => {
@@ -49,13 +49,7 @@ const clearOrderData = () => {
 };
 
 onMounted(async () => {
-  try {
-    // TODO: Replace with actual API call to get order details
-    // This is a placeholder that sets dummy values
-    totalAmount.value = 99.99;
-  } catch (error) {
-    console.error('Failed to fetch order details:', error);
-  }
+  // No need to fetch order details anymore as we have the total amount from the route
 });
 </script>
 

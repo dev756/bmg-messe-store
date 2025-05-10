@@ -351,7 +351,8 @@ const submitOrder = async (): Promise<void> => {
         orderNumber: order.orderNumber
       },
       query: {
-        paymentUrl: paymentUrl
+        paymentUrl: paymentUrl,
+        totalAmount: cartStore.totalPrice.toString()
       }
     });
   } catch (error) {
