@@ -146,8 +146,8 @@
               v-model="form.country"
               :class="{ 'error': countryError }"
             >
-              <option value="CH">Schweiz</option>
               <option value="DE">Deutschland</option>
+              <option value="CH">Schweiz</option>
               <option value="AT">Österreich</option>
               <option value="IT">Italien</option>
               <option value="FR">Frankreich</option>
@@ -208,7 +208,7 @@ const form = ref({
   address: '',
   zipCode: '',
   city: '',
-  country: 'CH'
+  country: 'DE'
 });
 
 const firstNameError = ref('');
@@ -375,10 +375,10 @@ const fillTestData = () => {
     firstName,
     lastName,
     email,
-    address: 'Bahnhofstrasse 1',
-    zipCode: '8001',
-    city: 'Zürich',
-    country: 'CH'
+    address: 'Carl-Zeiss-Ring 15',
+    zipCode: '85737',
+    city: 'Ismaning',
+    country: 'DE'
   };
   // Trigger validation
   validateFirstName();
