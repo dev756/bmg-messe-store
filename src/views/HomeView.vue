@@ -21,7 +21,7 @@
           <div class="product-info">
             <h2 class="product-name">{{ product.name }}</h2>
             <div class="product-details">
-              <p class="price">CHF {{ product.price.toFixed(2) }}</p>
+              <p class="price">EUR {{ product.price.toFixed(2) }}</p>
               <p class="stock" :class="{ 'low-stock': (product.stockLevel ?? 0) <= 5 }">
                 {{ (product.stockLevel ?? 0) === 0 ? 'Leider kein Bestand mehr' : (product.stockLevel ?? 0) <= 5 ? 'Nur noch ' + (product.stockLevel ?? 0) + ' verfügbar' : 'Auf Lager' }}
               </p>

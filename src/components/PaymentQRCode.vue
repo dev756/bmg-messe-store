@@ -13,7 +13,7 @@
     <div class="payment-details">
       <div class="amount">
         <span>Zu bezahlender Betrag:</span>
-        <span class="price">CHF {{ amount.toFixed(2) }}</span>
+        <span class="price">EUR {{ amount.toFixed(2) }}</span>
       </div>
       <p class="instructions">
         Scannen Sie diesen QR-Code mit Ihrem Smartphone, um zur Zahlung zu gelangen

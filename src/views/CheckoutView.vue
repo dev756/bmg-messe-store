@@ -27,7 +27,7 @@
               <p class="quantity">Menge: {{ item.quantity }}</p>
             </div>
             <div class="item-price">
-              CHF {{ item.price.toFixed(2) }}
+              EUR {{ item.price.toFixed(2) }}
             </div>
           </div>
         </div>
@@ -35,11 +35,11 @@
         <div class="order-total">
           <div class="vat">
             <span>Inkl. MwSt. (8.1%)</span>
-            <span>CHF {{ (cartStore.totalPrice - cartStore.totalPrice / 1.081).toFixed(2) }}</span>
+            <span>EUR {{ (cartStore.totalPrice - cartStore.totalPrice / 1.081).toFixed(2) }}</span>
           </div>
           <div class="total">
             <span>Total</span>
-            <span>CHF {{ cartStore.totalPrice.toFixed(2) }}</span>
+            <span>EUR {{ cartStore.totalPrice.toFixed(2) }}</span>
           </div>
         </div>
       </div>

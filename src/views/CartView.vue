@@ -15,7 +15,7 @@
           </div>
           <div class="item-details">
             <h3>{{ item.name }}</h3>
-            <p class="price">CHF {{ item.price.toFixed(2) }}</p>
+            <p class="price">EUR {{ item.price.toFixed(2) }}</p>
           </div>
           <div class="quantity-controls">
             <button 
@@ -31,7 +31,7 @@
             >+</button>
           </div>
           <div class="item-total">
-            CHF {{ (item.price * item.quantity).toFixed(2) }}
+            EUR {{ (item.price * item.quantity).toFixed(2) }}
           </div>
           <button @click="cartStore.removeFromCart(item.sku)" class="remove-btn">
             Entfernen
@@ -44,11 +44,11 @@
         <div class="order-total">
           <div class="vat">
             <span>Inkl. MwSt. (8.1%)</span>
-            <span>CHF {{ (cartStore.totalPrice - cartStore.totalPrice / 1.081).toFixed(2) }}</span>
+            <span>EUR {{ (cartStore.totalPrice - cartStore.totalPrice / 1.081).toFixed(2) }}</span>
           </div>
           <div class="total">
             <span>Total</span>
-            <span>CHF {{ cartStore.totalPrice.toFixed(2) }}</span>
+            <span>EUR {{ cartStore.totalPrice.toFixed(2) }}</span>
           </div>
         </div>
         <router-link to="/checkout" class="checkout-btn">

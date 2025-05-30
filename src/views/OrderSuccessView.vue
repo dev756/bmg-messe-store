@@ -6,7 +6,7 @@
       <p class="message">Vielen Dank für Ihre Bestellung. Wir benachrichtigen Sie, wenn sie zur Abholung bereit ist.</p>
       <div class="order-details">
         <p>Bestellnummer: {{ orderNumber }}</p>
-        <p>Gesamtbetrag: CHF {{ totalAmount.toFixed(2) }}</p>
+        <p>Gesamtbetrag: EUR {{ totalAmount.toFixed(2) }}</p>
       </div>
 
       <PaymentQRCode 
