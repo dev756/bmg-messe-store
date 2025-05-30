@@ -3,7 +3,7 @@ import { ref, watch } from 'vue';
 import { fetchProducts } from '../services/api';
 import type { Product } from '../types';
 
-const PRODUCTS_STORAGE_KEY = 'mcshop-products';
+const PRODUCTS_STORAGE_KEY = 'mcshop-products-eur';
 
 // Load initial products data from localStorage
 const loadProductsFromStorage = (): Product[] => {
