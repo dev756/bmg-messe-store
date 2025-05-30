@@ -1,42 +1,65 @@
 <template>
   <div class="order-success">
     <div class="success-content">
-      <div class="success-icon">✓</div>
-      <h1>Bestellung Bestätigt!</h1>
-      <p class="message">Vielen Dank für Ihre Bestellung. Wir benachrichtigen Sie, wenn sie zur Abholung bereit ist.</p>
-      <div class="order-details">
-        <p>Bestellnummer: {{ orderNumber }}</p>
-        <p>Gesamtbetrag: EUR {{ totalAmount.toFixed(2) }}</p>
+      <div v-if="!isOrderPaid" class="payment-pending">
+        <div class="success-icon">✓</div>
+        <h1>Bestellung Bestätigt!</h1>
+        <p class="message">Vielen Dank für Ihre Bestellung. Wir benachrichtigen Sie, wenn sie zur Abholung bereit ist.</p>
+        <div class="order-details">
+          <p>Bestellnummer: {{ orderNumber }}</p>
+          <p>Gesamtbetrag: EUR {{ totalAmount.toFixed(2) }}</p>
+        </div>
+
+        <PaymentQRCode 
+          :order-number="orderNumber"
+          :amount="totalAmount"
+          :payment-url="paymentUrl"
+          class="payment-section"
+        />
+
+        <router-link 
+          to="/" 
+          class="continue-shopping"
+          @click="clearOrderData"
+        >
+          Weiter Einkaufen
+        </router-link>
       </div>
 
-      <PaymentQRCode 
-        :order-number="orderNumber"
-        :amount="totalAmount"
-        :payment-url="paymentUrl"
-        class="payment-section"
-      />
+      <div v-else class="payment-success">
+        <div class="success-icon paid">✓</div>
+        <h1>Die Bestellung wurde bezahlt</h1>
+        <p class="message">Ihre Zahlung wurde erfolgreich verarbeitet. Sie können Ihre Bestellung an der Kasse abholen.</p>
+        <div class="order-details">
+          <p>Bestellnummer: {{ orderNumber }}</p>
+          <p>Gesamtbetrag: EUR {{ totalAmount.toFixed(2) }}</p>
+        </div>
 
-      <router-link 
-        to="/" 
-        class="continue-shopping"
-        @click="clearOrderData"
-      >
-        Weiter Einkaufen
-      </router-link>
+        <router-link 
+          to="/" 
+          class="continue-shopping"
+          @click="clearOrderData"
+        >
+          Weiter Einkaufen
+        </router-link>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import PaymentQRCode from '../components/PaymentQRCode.vue';
+import { checkOrderPaymentStatus } from '../services/api';
 
 const route = useRoute();
 const router = useRouter();
 const orderNumber = ref(typeof route.params.orderNumber === 'string' ? route.params.orderNumber : '');
 const totalAmount = ref(parseFloat(route.query.totalAmount as string) || 0);
 const paymentUrl = ref(typeof route.query.paymentUrl === 'string' ? route.query.paymentUrl : '');
+const isOrderPaid = ref(false);
+const pollingInterval = ref<number | null>(null);
 
 const clearOrderData = () => {
   // Clear the current route data
@@ -44,12 +67,49 @@ const clearOrderData = () => {
   totalAmount.value = 0;
   paymentUrl.value = '';
   
+  // Stop polling when leaving the page
+  stopPolling();
+  
   // Replace the current history entry with a clean one
   router.replace({ name: 'home' });
 };
 
+const checkPaymentStatus = async () => {
+  try {
+    const isPaid = await checkOrderPaymentStatus(orderNumber.value);
+    if (isPaid) {
+      isOrderPaid.value = true;
+      stopPolling();
+    }
+  } catch (error) {
+    console.error('Error checking payment status:', error);
+    // Continue polling even if there's an error
+  }
+};
+
+const startPolling = () => {
+  // Check immediately
+  checkPaymentStatus();
+  
+  // Then check every 1 second
+  pollingInterval.value = window.setInterval(checkPaymentStatus, 1000);
+};
+
+const stopPolling = () => {
+  if (pollingInterval.value) {
+    clearInterval(pollingInterval.value);
+    pollingInterval.value = null;
+  }
+};
+
 onMounted(async () => {
-  // No need to fetch order details anymore as we have the total amount from the route
+  // Start polling for payment status
+  startPolling();
+});
+
+onUnmounted(() => {
+  // Clean up polling when component is unmounted
+  stopPolling();
 });
 </script>
 
@@ -83,6 +143,26 @@ onMounted(async () => {
   justify-content: center;
   font-size: 2.5rem;
   margin: 0 auto 2rem;
+}
+
+.success-icon.paid {
+  background-color: #4caf50;
+  animation: pulse 2s ease-in-out;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7);
+  }
+  70% {
+    transform: scale(1.1);
+    box-shadow: 0 0 0 10px rgba(76, 175, 80, 0);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(76, 175, 80, 0);
+  }
 }
 
 h1 {

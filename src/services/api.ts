@@ -92,4 +92,31 @@ export async function checkPassword(password: string): Promise<boolean> {
     console.error('Error checking password:', error);
     throw error;
   }
+}
+
+export async function checkOrderPaymentStatus(orderNumber: string): Promise<boolean> {
+  if (USE_MOCK_API) {
+    console.log('checkOrderPaymentStatus', orderNumber);
+    // For mock API, simulate random payment status for testing
+    return Math.random() > 0.92; // 8% chance of being paid
+  }
+
+  try {
+    const formData = new FormData();
+    formData.append('orderNumber', orderNumber);
+    
+    const response = await fetch(`${API_BASE_URL}/Actindo.Modules.Actindo.POS.ClickAndCollectShop.isOrderPaid`, {
+      method: 'POST',
+      body: formData
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to check order payment status');
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error checking order payment status:', error);
+    throw error;
+  }
 } 
