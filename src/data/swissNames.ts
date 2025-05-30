@@ -8,7 +8,8 @@ export const firstNames = [
   'Anna',
   'Ursula',
   'Sandra',
-  'Monika'
+  'Monika',
+  'Boris'
 ];
 
 export const lastNames = [
@@ -21,19 +22,17 @@ export const lastNames = [
   'Huber',
   'Wagner',
   'Becker',
-  'Hoffmann'
+  'Hoffmann',
+  'Krstic'
 ];
 
-let firstNameIndex = 0;
-let lastNameIndex = 0;
 
 export function getNextName() {
+  const firstNameIndex = Math.floor(Math.random() * firstNames.length);
+  const lastNameIndex = Math.floor(Math.random() * lastNames.length);
+  
   const firstName = firstNames[firstNameIndex];
   const lastName = lastNames[lastNameIndex];
-  
-  // Increment indices
-  firstNameIndex = (firstNameIndex + 1) % firstNames.length;
-  lastNameIndex = (lastNameIndex + 1) % lastNames.length;
   
   // Replace umlauts in email
   const emailFirstName = firstName.toLowerCase()
