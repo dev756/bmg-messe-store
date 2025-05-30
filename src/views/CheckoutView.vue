@@ -34,8 +34,8 @@
         
         <div class="order-total">
           <div class="vat">
-            <span>Inkl. MwSt. (8.1%)</span>
-            <span>EUR {{ (cartStore.totalPrice - cartStore.totalPrice / 1.081).toFixed(2) }}</span>
+            <span>Inkl. MwSt. (19%)</span>
+            <span>EUR {{ (cartStore.totalPrice - cartStore.totalPrice / 1.19).toFixed(2) }}</span>
           </div>
           <div class="total">
             <span>Total</span>
