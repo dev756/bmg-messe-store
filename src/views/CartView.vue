@@ -46,6 +46,10 @@
             <span>Inkl. MwSt. (19%)</span>
             <span>EUR {{ (cartStore.totalPrice - cartStore.totalPrice / 1.19).toFixed(2) }}</span>
           </div>
+          <div class="vat">
+            <span>Versand</span>
+            <span>EUR 0.00</span>
+          </div>
           <div class="total">
             <span>Total</span>
             <span>EUR {{ cartStore.totalPrice.toFixed(2) }}</span>
