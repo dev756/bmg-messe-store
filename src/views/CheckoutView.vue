@@ -45,7 +45,7 @@
       </div>
       
       <div class="checkout-form">
-        <h2>Contact Information</h2>
+        <h2>Lieferadresse</h2>
         <form @submit.prevent="submitOrder">
           <button 
             v-if="isDev || showTestData" 
@@ -160,8 +160,8 @@
             <h3>Zahlungsinformationen</h3>
             <p>Sie können Ihre Bestellung in zwei verschiedenen Weisen bezahlen:</p>
             <ul>
-              <li>Beim Abholen der Bestellung in der Filiale bezahlen</li>
-              <li>Vorab bezahlen mit unserer mobilen App (QR-Code wird nach Bestellbestätigung angezeigt)</li>
+              <li>Nach Abschluss der Bestellung an der Kasse zahlen</li>
+              <li>Den QR-Code scannen und bequem über das Handy online bezahlen (QR-Code wird nach Bestellbestätigung angezeigt)</li>
             </ul>
           </div>
           
