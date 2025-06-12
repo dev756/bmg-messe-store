@@ -147,11 +147,11 @@
               :class="{ 'error': countryError }"
             >
               <option value="DE">Deutschland</option>
-              <option value="CH">Schweiz</option>
+             <!--- <option value="CH">Schweiz</option>
               <option value="AT">Österreich</option>
               <option value="IT">Italien</option>
               <option value="FR">Frankreich</option>
-              <option value="LI">Liechtenstein</option>
+              <option value="LI">Liechtenstein</option>-->
             </select>
             <span class="error-message" v-if="countryError">{{ countryError }}</span>
           </div>
