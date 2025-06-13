@@ -12,7 +12,7 @@
       </div>
       <div class="product-info">
         <h1>{{ product.name }}</h1>
-        <p class="price">EUR {{ product.price.toFixed(2) }}</p>
+        <PriceDisplay :price="product.price" :special-price="product.specialPrice" size="large" />
         <div class="description" v-html="product.description"></div>
         <p class="stock" :class="{ 'low-stock': (product.stockLevel ?? 0) <= 5 }">
           {{ (product.stockLevel ?? 0) === 0 ? 'Leider kein Bestand mehr' : (product.stockLevel ?? 0) <= 5 ? 'Nur noch wenige verfügbar' : 'Auf Lager' }}
@@ -52,6 +52,7 @@ import { useCartStore } from '../stores/cart';
 import { useProductStore } from '../stores/products';
 import Toast from '../components/Toast.vue';
 import AddToCartAnimation from '../components/AddToCartAnimation.vue';
+import PriceDisplay from '../components/PriceDisplay.vue';
 import type { Product } from '../types';
 
 const route = useRoute();

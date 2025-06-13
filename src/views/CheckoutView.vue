@@ -27,7 +27,7 @@
               <p class="quantity">Menge: {{ item.quantity }}</p>
             </div>
             <div class="item-price">
-              EUR {{ item.price.toFixed(2) }}
+              <PriceDisplay :price="item.originalPrice" :special-price="item.price !== item.originalPrice ? item.price : undefined" />
             </div>
           </div>
         </div>
@@ -193,6 +193,7 @@ import type { Order, Customer } from '../types';
 import Toast from '../components/Toast.vue';
 import { createOrder } from '../services/api';
 import { getNextName } from '../data/swissNames';
+import PriceDisplay from '../components/PriceDisplay.vue';
 
 const router = useRouter();
 const cartStore = useCartStore();

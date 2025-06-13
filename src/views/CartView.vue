@@ -15,7 +15,7 @@
           </div>
           <div class="item-details">
             <h3>{{ item.name }}</h3>
-            <p class="price">EUR {{ item.price.toFixed(2) }}</p>
+            <PriceDisplay :price="item.originalPrice" :special-price="item.price !== item.originalPrice ? item.price : undefined" />
           </div>
           <div class="quantity-controls">
             <button 
@@ -65,6 +65,7 @@
 
 <script setup lang="ts">
 import { useCartStore } from '../stores/cart';
+import PriceDisplay from '../components/PriceDisplay.vue';
 
 const cartStore = useCartStore();
 
@@ -173,12 +174,6 @@ h1 {
   color: var(--text-color);
   font-size: 1.2rem;
   font-weight: 600;
-}
-
-.price {
-  color: var(--primary-color);
-  font-weight: 600;
-  margin: 0.5rem 0;
 }
 
 .quantity-controls {

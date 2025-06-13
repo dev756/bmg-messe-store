@@ -21,13 +21,13 @@
           <div class="product-info">
             <h2 class="product-name">{{ product.name }}</h2>
             <div class="product-details">
-              <p class="price">EUR {{ product.price.toFixed(2) }}</p>
-              <p class="stock" :class="{ 'low-stock': (product.stockLevel ?? 0) <= 5 }">
-                {{ (product.stockLevel ?? 0) === 0 ? 'Leider kein Bestand mehr' : (product.stockLevel ?? 0) <= 5 ? 'Nur noch ' + (product.stockLevel ?? 0) + ' verfügbar' : 'Auf Lager' }}
-              </p>
+              <PriceDisplay :price="product.price" :special-price="product.specialPrice" />
             </div>
           </div>
         </router-link>
+        <p class="stock" :class="{ 'low-stock': (product.stockLevel ?? 0) <= 5 }">
+          {{ (product.stockLevel ?? 0) === 0 ? 'Leider kein Bestand mehr' : (product.stockLevel ?? 0) <= 5 ? 'Nur noch ' + (product.stockLevel ?? 0) + ' verfügbar' : 'Auf Lager' }}
+        </p>
         <button
           class="add-to-cart"
           :disabled="(product.stockLevel ?? 0) === 0"
@@ -59,6 +59,7 @@ import { useProductStore } from '../stores/products';
 import { useCartStore } from '../stores/cart';
 import Toast from '../components/Toast.vue';
 import AddToCartAnimation from '../components/AddToCartAnimation.vue';
+import PriceDisplay from '../components/PriceDisplay.vue';
 import type { Product } from '../types';
 
 const productStore = useProductStore();
@@ -278,6 +279,8 @@ h1 {
   color: var(--text-secondary);
   margin: 0;
   font-size: 0.8rem;
+  padding: 0.1rem 0.75rem 0.25rem 0.75rem;
+  background-color: var(--background-light);
 }
 
 .low-stock {
@@ -297,7 +300,7 @@ h1 {
   text-transform: uppercase;
   letter-spacing: 0.5px;
   width: 100%;
-  margin-top: auto;
+  margin-top: 0;
 }
 
 .add-to-cart:hover:not(:disabled) {

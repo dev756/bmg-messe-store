@@ -7,8 +7,21 @@ const CART_STORAGE_KEY = 'mcshop-cart';
 // Load initial cart data from localStorage
 const loadCartFromStorage = (): CartItem[] => {
   const savedCart = localStorage.getItem(CART_STORAGE_KEY);
-  return savedCart ? JSON.parse(savedCart) as CartItem[] : [];
+  if (!savedCart) return [];
+  
+  const cartItems = JSON.parse(savedCart) as CartItem[];
+  
+  // Handle migration for existing cart items that don't have originalPrice
+  return cartItems.map(item => ({
+    ...item,
+    originalPrice: item.originalPrice ?? item.price // Use existing price as originalPrice if not present
+  }));
 };
+
+// Utility function to get the effective price (specialPrice if available, otherwise price)
+export function getEffectivePrice(product: Product): number {
+  return product.specialPrice ?? product.price;
+}
 
 export const useCartStore = defineStore('cart', () => {
   const items = ref<CartItem[]>(loadCartFromStorage());
@@ -43,7 +56,14 @@ export const useCartStore = defineStore('cart', () => {
     if (existingItem) {
       existingItem.quantity++;
     } else {
-      items.value.push({ ...product, quantity: 1 });
+      // Use the effective price when adding to cart
+      const effectivePrice = getEffectivePrice(product);
+      items.value.push({ 
+        ...product, 
+        price: effectivePrice, // Store the effective price in cart
+        originalPrice: product.price, // Store the original price for comparison
+        quantity: 1 
+      });
     }
     return true;
   }

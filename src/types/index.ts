@@ -3,6 +3,7 @@ export interface Product {
   name: string;
   description: string;
   price: number;
+  specialPrice?: number;
   imageUrl: string;
   stockLevel: number;
 }
@@ -11,6 +12,7 @@ export interface CartItem {
   sku: string;
   name: string;
   price: number;
+  originalPrice: number;
   quantity: number;
   imageUrl: string;
   stockLevel: number;
