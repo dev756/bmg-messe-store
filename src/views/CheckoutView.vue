@@ -23,7 +23,11 @@
               <img :src="item.imageUrl" :alt="item.name" />
             </div>
             <div class="item-details">
-              <h3>{{ item.name }}</h3>
+              <div class="item-header">
+                <h3>{{ item.name }}</h3>
+                <span class="item-base-price">EUR {{ item.price.toFixed(2) }}</span>
+              </div>
+
               <!-- Display selected variants -->
               <div v-if="item.selectedVariants" class="item-variants">
                 <span
@@ -34,22 +38,29 @@
                   {{ key }}: {{ value }}
                 </span>
               </div>
-              <!-- Display customizations -->
-              <div v-if="item.selectedCustomizations && item.selectedCustomizations.length > 0" class="item-customizations">
+
+              <!-- Display customizations as indented sub-items -->
+              <div v-if="item.selectedCustomizations && item.selectedCustomizations.length > 0" class="customizations-list">
                 <div
                   v-for="customization in item.selectedCustomizations"
                   :key="customization.customizationId"
-                  class="customization-item"
+                  class="customization-line"
                 >
-                  <span class="customization-label">{{ customization.customizationName }}:</span>
-                  <span class="customization-value">{{ getCustomizationDisplayText(customization) }}</span>
-                  <span class="customization-price">+EUR {{ customization.totalPrice.toFixed(2) }}</span>
+                  <span class="customization-icon">↳</span>
+                  <span class="customization-text">
+                    {{ customization.customizationName }}: {{ getCustomizationDisplayText(customization) }}
+                  </span>
+                  <span class="customization-line-price">+EUR {{ customization.totalPrice.toFixed(2) }}</span>
                 </div>
               </div>
+
               <p class="quantity">Menge: {{ item.quantity }}</p>
-            </div>
-            <div class="item-price">
-              <PriceDisplay :price="item.originalPrice" :special-price="item.price !== item.originalPrice ? item.price : undefined" />
+
+              <!-- Total for this item -->
+              <div class="item-total-line">
+                <span>Zwischensumme:</span>
+                <span class="total-amount">EUR {{ ((item.finalPrice ?? item.price) * item.quantity).toFixed(2) }}</span>
+              </div>
             </div>
           </div>
         </div>
@@ -559,31 +570,66 @@ h1 {
   border: 1px solid #ddd;
 }
 
-.item-customizations {
-  margin-top: 0.5rem;
-}
-
-.customization-item {
+.item-header {
   display: flex;
-  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+}
+
+.item-header h3 {
+  flex: 1;
+}
+
+.item-base-price {
+  font-weight: 600;
+  color: var(--primary-color);
+  white-space: nowrap;
+}
+
+.customizations-list {
+  margin-top: 0.5rem;
+  margin-left: 0.5rem;
+  border-left: 2px solid var(--border-color);
+  padding-left: 0.75rem;
+}
+
+.customization-line {
+  display: flex;
+  align-items: baseline;
   gap: 0.5rem;
-  align-items: center;
-  font-size: 0.85rem;
   padding: 0.25rem 0;
+  font-size: 0.9rem;
 }
 
-.customization-label {
+.customization-icon {
   color: var(--text-secondary);
-  font-weight: 500;
+  font-size: 0.85rem;
+  flex-shrink: 0;
 }
 
-.customization-value {
-  color: var(--text-color);
+.customization-text {
+  flex: 1;
+  color: var(--text-secondary);
 }
 
-.customization-price {
+.customization-line-price {
   color: var(--primary-color);
   font-weight: 600;
+  white-space: nowrap;
+}
+
+.item-total-line {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border-color);
+  font-weight: 600;
+}
+
+.total-amount {
+  color: var(--primary-color);
 }
 
 .quantity {

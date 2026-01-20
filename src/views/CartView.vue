@@ -36,7 +36,11 @@
           </div>
           <div class="item-content">
             <div class="item-details">
-              <h3>{{ item.name }}</h3>
+              <div class="item-header">
+                <h3>{{ item.name }}</h3>
+                <span class="item-base-price">EUR {{ item.price.toFixed(2) }}</span>
+              </div>
+
               <!-- Display selected variants -->
               <div v-if="item.selectedVariants" class="item-variants">
                 <span
@@ -47,41 +51,25 @@
                   {{ key }}: {{ value }}
                 </span>
               </div>
-              <!-- Display customizations as simple list -->
-              <div v-if="item.selectedCustomizations && item.selectedCustomizations.length > 0" class="item-customizations">
+
+              <!-- Display customizations as indented sub-items -->
+              <div v-if="item.selectedCustomizations && item.selectedCustomizations.length > 0" class="customizations-list">
                 <div
                   v-for="customization in item.selectedCustomizations"
                   :key="customization.customizationId"
-                  class="customization-item"
+                  class="customization-line"
                 >
-                  <span class="customization-name">{{ customization.customizationName }}:</span>
-                  <span class="customization-details">
-                    {{ getCustomizationDisplayText(customization) }}
+                  <span class="customization-icon">↳</span>
+                  <span class="customization-text">
+                    {{ customization.customizationName }}: {{ getCustomizationDisplayText(customization) }}
                   </span>
+                  <span class="customization-line-price">+EUR {{ customization.totalPrice.toFixed(2) }}</span>
                 </div>
               </div>
-              <!-- Price breakdown -->
-              <div v-if="item.selectedCustomizations && item.selectedCustomizations.length > 0" class="price-breakdown">
-                <div class="price-row">
-                  <span>Artikel:</span>
-                  <span>EUR {{ item.price.toFixed(2) }}</span>
-                </div>
-                <div
-                  v-for="customization in item.selectedCustomizations"
-                  :key="customization.customizationId"
-                  class="price-row"
-                >
-                  <span>{{ customization.customizationName }}:</span>
-                  <span>+EUR {{ customization.totalPrice.toFixed(2) }}</span>
-                </div>
-                <div class="price-row unit-price">
-                  <span>Stückpreis:</span>
-                  <span>EUR {{ (item.finalPrice ?? item.price).toFixed(2) }}</span>
-                </div>
-              </div>
-              <!-- Simple price when no customizations -->
-              <div v-else class="simple-price">
-                <PriceDisplay :price="item.originalPrice" :special-price="item.price !== item.originalPrice ? item.price : undefined" />
+
+              <!-- Show special price if applicable -->
+              <div v-if="item.price !== item.originalPrice" class="special-price-note">
+                <PriceDisplay :price="item.originalPrice" :special-price="item.price" />
               </div>
             </div>
             <div class="item-actions">
@@ -309,53 +297,56 @@ h1 {
   border: 1px solid #ddd;
 }
 
-.item-customizations {
-  margin-top: 0.5rem;
-}
-
-.customization-item {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  align-items: center;
-  font-size: 0.9rem;
-  padding: 0.15rem 0;
-}
-
-.customization-name {
-  color: var(--text-secondary);
-  font-weight: 500;
-}
-
-.customization-details {
-  color: var(--text-color);
-}
-
-.price-breakdown {
-  margin-top: 0.75rem;
-  padding: 0.75rem;
-  background-color: white;
-  border: 2px solid #000;
-  border-radius: 6px;
-  font-size: 0.9rem;
-}
-
-.price-breakdown .price-row {
+.item-header {
   display: flex;
   justify-content: space-between;
-  padding: 0.2rem 0;
+  align-items: baseline;
+  gap: 1rem;
+}
+
+.item-header h3 {
+  flex: 1;
+}
+
+.item-base-price {
+  font-weight: 600;
+  color: var(--primary-color);
+  white-space: nowrap;
+}
+
+.customizations-list {
+  margin-top: 0.5rem;
+  margin-left: 0.5rem;
+  border-left: 2px solid var(--border-color);
+  padding-left: 0.75rem;
+}
+
+.customization-line {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  padding: 0.25rem 0;
+  font-size: 0.9rem;
+}
+
+.customization-icon {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+.customization-text {
+  flex: 1;
   color: var(--text-secondary);
 }
 
-.price-breakdown .unit-price {
-  border-top: 2px solid #000;
-  margin-top: 0.5rem;
-  padding-top: 0.5rem;
+.customization-line-price {
+  color: var(--primary-color);
   font-weight: 600;
-  color: var(--text-color);
+  white-space: nowrap;
 }
 
-.simple-price {
+.special-price-note {
   margin-top: 0.5rem;
 }
 
@@ -406,7 +397,7 @@ h1 {
 }
 
 .item-total {
-  color: var(--text-color);
+  color: var(--primary-color);
   font-weight: 700;
   font-size: 1.1rem;
   margin-left: auto;
