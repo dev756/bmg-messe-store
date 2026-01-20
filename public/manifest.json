@@ -1,7 +1,7 @@
 {
-  "name": "Kapten&Son Messe Store",
-  "short_name": "Messe Store",
-  "description": "Kapten&Son Messe Store",
+  "name": "FohlenShop",
+  "short_name": "FohlenShop",
+  "description": "FohlenShop - Borussia Mönchengladbach Fan Shop",
   "start_url": "/",
   "display": "fullscreen",
   "background_color": "#ffffff",

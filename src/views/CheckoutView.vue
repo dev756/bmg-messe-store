@@ -18,12 +18,34 @@
       <div class="order-summary">
         <h2>Bestellübersicht</h2>
         <div class="cart-items">
-          <div v-for="item in cartStore.items" :key="item.sku" class="cart-item">
+          <div v-for="item in cartStore.items" :key="item.cartItemId" class="cart-item">
             <div class="item-image">
               <img :src="item.imageUrl" :alt="item.name" />
             </div>
             <div class="item-details">
               <h3>{{ item.name }}</h3>
+              <!-- Display selected variants -->
+              <div v-if="item.selectedVariants" class="item-variants">
+                <span
+                  v-for="(value, key) in item.selectedVariants"
+                  :key="key"
+                  class="variant-badge"
+                >
+                  {{ key }}: {{ value }}
+                </span>
+              </div>
+              <!-- Display customizations -->
+              <div v-if="item.selectedCustomizations && item.selectedCustomizations.length > 0" class="item-customizations">
+                <div
+                  v-for="customization in item.selectedCustomizations"
+                  :key="customization.customizationId"
+                  class="customization-item"
+                >
+                  <span class="customization-label">{{ customization.customizationName }}:</span>
+                  <span class="customization-value">{{ getCustomizationDisplayText(customization) }}</span>
+                  <span class="customization-price">+EUR {{ customization.totalPrice.toFixed(2) }}</span>
+                </div>
+              </div>
               <p class="quantity">Menge: {{ item.quantity }}</p>
             </div>
             <div class="item-price">
@@ -189,7 +211,7 @@ import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useCartStore } from '../stores/cart';
 import { useProductStore } from '../stores/products';
-import type { Order, Customer } from '../types';
+import type { Order, Customer, SelectedCustomization } from '../types';
 import Toast from '../components/Toast.vue';
 import { createOrder } from '../services/api';
 import { getNextName } from '../data/swissNames';
@@ -237,7 +259,7 @@ const generateOrderNumber = () => {
   for (let i = 0; i < 6; i++) {
     result += chars.charAt(Math.floor(Math.random() * chars.length));
   }
-  return `KS-${year}-${result}`;
+  return `BMG-${year}-${result}`;
 };
 
 const validateFirstName = () => {
@@ -342,16 +364,29 @@ const submitOrder = async (): Promise<void> => {
         country: form.value.country
       },
       items: cartStore.items.map(item => ({
-        sku: item.sku,
-        quantity: item.quantity
+        sku: item.sku,  // This is now the variant SKU
+        quantity: item.quantity,
+        selectedVariants: item.selectedVariants,  // Include variant info for backend tracking
+        customizations: item.selectedCustomizations?.map(c => ({
+          customizationId: c.customizationId,
+          fields: c.fields.map(f => ({
+            fieldId: f.fieldId,
+            value: f.value
+          }))
+        }))
       }))
     };
 
     const { paymentUrl } = await createOrder(order);
-    
+
+    // Update stock levels for each cart item
+    cartStore.items.forEach(item => {
+      productStore.updateStockLevel(item.sku, item.quantity, item.selectedVariants);
+    });
+
     // Store total amount before clearing cart
     const totalAmount = cartStore.totalPrice;
-    
+
     // Clear cart and redirect to success page
     cartStore.clearCart();
     router.push({
@@ -373,6 +408,38 @@ const submitOrder = async (): Promise<void> => {
     isSubmitting.value = false;
   }
 };
+
+// Get display text for a customization
+function getCustomizationDisplayText(customization: SelectedCustomization): string {
+  // Simple addon with no fields
+  if (customization.fields.length === 0) {
+    return 'Hinzugefügt';
+  }
+
+  const presetField = customization.fields.find(f => f.fieldId === 'preset');
+
+  if (presetField) {
+    if (presetField.value === 'custom') {
+      const nameField = customization.fields.find(f => f.fieldId === 'name');
+      const numberField = customization.fields.find(f => f.fieldId === 'number');
+      if (nameField && numberField) {
+        return `${nameField.value} (#${numberField.value})`;
+      }
+      return customization.fields
+        .filter(f => f.fieldId !== 'preset')
+        .map(f => f.displayValue)
+        .join(', ');
+    }
+    return presetField.displayValue;
+  }
+
+  const toggleField = customization.fields.find(f => f.value === true);
+  if (toggleField) {
+    return toggleField.displayValue === 'Ja' ? 'Hinzugefügt' : toggleField.displayValue;
+  }
+
+  return customization.fields.map(f => f.displayValue).join(', ');
+}
 
 const fillTestData = () => {
   const { firstName, lastName, email } = getNextName();
@@ -417,10 +484,11 @@ h1 {
 }
 
 .order-summary {
-  background-color: var(--background-light);
-  border-radius: 12px;
+  background-color: white;
+  border-radius: 8px;
   border: 1px solid var(--border-color);
   padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
 }
 
 .order-summary h2 {
@@ -468,6 +536,51 @@ h1 {
   font-weight: 600;
 }
 
+.item-variants {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.variant-badge {
+  background-color: #f0f0f0;
+  color: #666;
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  border: 1px solid #ddd;
+}
+
+.item-customizations {
+  margin-top: 0.5rem;
+}
+
+.customization-item {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  font-size: 0.85rem;
+  padding: 0.25rem 0;
+}
+
+.customization-label {
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.customization-value {
+  color: var(--text-color);
+}
+
+.customization-price {
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
 .quantity {
   color: var(--text-secondary);
   margin: 0.5rem 0 0 0;
@@ -479,8 +592,8 @@ h1 {
 }
 
 .order-total {
-  background-color: var(--background-dark);
-  border-radius: 8px;
+  background-color: var(--background-light);
+  border-radius: 6px;
   padding: 1rem;
   margin-top: 1rem;
 }
@@ -504,10 +617,11 @@ h1 {
 }
 
 .checkout-form {
-  background-color: var(--background-light);
-  border-radius: 12px;
+  background-color: white;
+  border-radius: 8px;
   border: 1px solid var(--border-color);
   padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
 }
 
 .checkout-form h2 {
@@ -531,15 +645,18 @@ h1 {
 .form-group input {
   width: 100%;
   padding: 0.75rem;
-  border: 1px solid #ddd;
-  border-radius: 0.5rem;
+  border: 2px solid var(--border-color);
+  border-radius: 6px;
   font-size: 1rem;
-  transition: border-color 0.2s;
+  transition: all 0.15s ease-in-out;
+  box-shadow: var(--shadow-sm);
+  font-family: 'Signika', 'Tahoma', sans-serif;
 }
 
 .form-group input:focus {
   outline: none;
   border-color: var(--primary-color);
+  box-shadow: var(--shadow-md);
 }
 
 .form-group input.error {
@@ -555,35 +672,40 @@ h1 {
 
 .place-order-btn {
   width: 100%;
-  background-color: var(--primary-color);
-  color: var(--background-dark);
+  background-color: #000;
+  color: white;
   border: none;
   padding: 1rem;
   border-radius: 6px;
   font-size: 1.1rem;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.15s ease-in-out;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: var(--shadow-md);
 }
 
 .place-order-btn:hover:not(:disabled) {
-  background-color: var(--text-secondary);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  background-color: #1a1a1a;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-lg);
 }
 
 .place-order-btn:disabled {
-  background-color: #666;
+  background-color: #999;
   cursor: not-allowed;
-  opacity: 0.7;
+  opacity: 0.6;
+  box-shadow: none;
 }
 
 .payment-info {
-  background-color: var(--background-dark);
-  border-radius: 8px;
+  background-color: var(--background-light);
+  border-radius: 6px;
   padding: 1.5rem;
   margin-bottom: 1.5rem;
   text-align: left;
+  border: 1px solid var(--border-color);
 }
 
 .payment-info h3 {
@@ -657,10 +779,10 @@ h1 {
 .processing-content {
   text-align: center;
   padding: 2rem;
-  background-color: var(--background-light);
-  border-radius: 12px;
+  background-color: white;
+  border-radius: 8px;
   border: 1px solid var(--border-color);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-lg);
 }
 
 .processing-spinner {
@@ -708,17 +830,20 @@ h1 {
 select {
   width: 100%;
   padding: 0.75rem;
-  border: 1px solid #ddd;
-  border-radius: 0.5rem;
+  border: 2px solid var(--border-color);
+  border-radius: 6px;
   font-size: 1rem;
-  transition: border-color 0.2s;
+  transition: all 0.15s ease-in-out;
   background-color: white;
   cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  font-family: 'Signika', 'Tahoma', sans-serif;
 }
 
 select:focus {
   outline: none;
   border-color: var(--primary-color);
+  box-shadow: var(--shadow-md);
 }
 
 select.error {
@@ -728,23 +853,23 @@ select.error {
 .fill-test-data-btn {
   width: 100%;
   background-color: var(--primary-color);
-  color: var(--background-dark);
+  color: white;
   border: none;
   padding: 1rem;
   border-radius: 6px;
-  font-size: 1.1rem;
-  font-weight: 600;
+  font-size: 1rem;
+  font-weight: 700;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.15s ease-in-out;
   margin-bottom: 1.5rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-md);
 }
 
 .fill-test-data-btn:hover {
-  background-color: var(--text-secondary);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  background-color: var(--primary-dark);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-lg);
 }
 </style> 

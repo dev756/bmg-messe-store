@@ -47,7 +47,8 @@ onMounted(async () => {
     <template v-else>
       <nav class="navbar">
         <router-link to="/" class="logo">
-          <img src="./assets/logo.svg" alt="Kapten & Son" class="logo-img" />
+          <img src="./assets/logo.svg" alt="FohlenShop Logo" class="logo-img" />
+          <span class="logo-text">FohlenShop</span>
         </router-link>
         <div class="nav-links">
           <router-link to="/cart" class="cart-link">
@@ -64,14 +65,20 @@ onMounted(async () => {
 </template>
 
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Signika:wght@300;400;500;600;700&display=swap');
+
 :root {
-  --primary-color: #000000;
+  --primary-color: #7ab929;
+  --primary-dark: #6aa520;
   --background-dark: #ffffff;
-  --background-light: rgb(237, 234, 230);
+  --background-light: #f4f4f4;
   --text-color: #000000;
   --text-secondary: #666666;
-  --accent-color: #000000;
-  --border-color: #e0e0e0;
+  --accent-color: #7ab929;
+  --border-color: #eaeaea;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 .app {
@@ -80,7 +87,7 @@ onMounted(async () => {
   flex-direction: column;
   background-color: var(--background-dark);
   color: var(--text-color);
-  font-family: 'UncutSans', sans-serif;
+  font-family: 'Signika', 'Tahoma', sans-serif;
 }
 
 .navbar {
@@ -94,19 +101,28 @@ onMounted(async () => {
   top: 0;
   z-index: 100;
   backdrop-filter: blur(10px);
-  background-color: rgba(255, 255, 255, 0.8);
+  background-color: #ffffff;
   min-width: 700px;
+  box-shadow: var(--shadow-sm);
 }
 
 .logo {
   text-decoration: none;
   display: flex;
   align-items: center;
+  gap: 0.75rem;
 }
 
 .logo-img {
-  height: 40px;
+  height: 60px;
   width: auto;
+}
+
+.logo-text {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-color);
+  letter-spacing: -0.5px;
 }
 
 .nav-links {
@@ -118,18 +134,21 @@ onMounted(async () => {
   color: var(--text-color);
   text-decoration: none;
   padding: 0.8rem 1.5rem;
-  border-radius: 4px;
+  border-radius: 6px;
   background-color: var(--background-light);
   border: 1px solid var(--border-color);
-  font-weight: 500;
-  transition: all 0.3s ease;
-  font-family: 'UncutSans', sans-serif;
+  font-weight: 600;
+  transition: all 0.15s ease-in-out;
+  font-family: 'Signika', 'Tahoma', sans-serif;
+  box-shadow: var(--shadow-sm);
 }
 
 .cart-link:hover {
   background-color: var(--primary-color);
   color: var(--background-dark);
   border-color: var(--primary-color);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
 }
 
 .main-content {
@@ -146,7 +165,7 @@ onMounted(async () => {
 }
 
 body {
-  font-family: 'UncutSans', sans-serif;
+  font-family: 'Signika', 'Tahoma', sans-serif;
   line-height: 1.6;
   color: var(--text-color);
   background-color: var(--background-dark);
@@ -185,11 +204,15 @@ a, button {
   .navbar {
     padding: 1rem;
   }
-  
+
   .logo-img {
-    height: 30px;
+    height: 45px;
   }
-  
+
+  .logo-text {
+    font-size: 1.2rem;
+  }
+
   .cart-link {
     padding: 0.6rem 1rem;
     font-size: 0.9rem;

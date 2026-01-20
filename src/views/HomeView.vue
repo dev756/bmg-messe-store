@@ -16,7 +16,7 @@
       >
         <router-link :to="`/product/${product.sku}`" class="product-link">
           <div class="product-image">
-            <img :src="product.imageUrl" :alt="product.name" />
+            <img :src="product.imageUrls[0]" :alt="product.name" />
           </div>
           <div class="product-info">
             <h2 class="product-name">{{ product.name }}</h2>
@@ -25,21 +25,21 @@
             </div>
           </div>
         </router-link>
-        <p class="stock" :class="{ 'low-stock': (product.stockLevel ?? 0) <= 5 }">
-          {{ (product.stockLevel ?? 0) === 0 ? 'Leider kein Bestand mehr' : (product.stockLevel ?? 0) <= 5 ? 'Nur noch ' + (product.stockLevel ?? 0) + ' verfügbar' : 'Auf Lager' }}
+        <p class="stock" :class="{ 'low-stock': getStockLevel(product) <= 5 && getStockLevel(product) > 0 }">
+          {{ getStockMessage(product) }}
         </p>
         <button
           class="add-to-cart"
-          :disabled="(product.stockLevel ?? 0) === 0"
-          @click="addToCart(product, $event)"
+          :disabled="!productStore.hasAnyStock(product) || product.hasVariants"
+          @click="product.hasVariants ? navigateToProduct(product.sku, $event) : addToCart(product, $event)"
         >
-          {{ (product.stockLevel ?? 0) === 0 ? 'Leider ausverkauft' : 'In den Warenkorb' }}
+          {{ getButtonText(product) }}
         </button>
       </div>
     </div>
     <AddToCartAnimation
       v-if="showAnimation && animationProduct"
-      :image-url="animationProduct.imageUrl || ''"
+      :image-url="animationProduct.imageUrls?.[0] || ''"
       :product-name="animationProduct.name || ''"
       :start-position="animationStart"
       :end-position="animationEnd"
@@ -55,6 +55,7 @@
 
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref } from 'vue';
+import { useRouter } from 'vue-router';
 import { useProductStore } from '../stores/products';
 import { useCartStore } from '../stores/cart';
 import Toast from '../components/Toast.vue';
@@ -62,6 +63,7 @@ import AddToCartAnimation from '../components/AddToCartAnimation.vue';
 import PriceDisplay from '../components/PriceDisplay.vue';
 import type { Product } from '../types';
 
+const router = useRouter();
 const productStore = useProductStore();
 const cartStore = useCartStore();
 const showToast = ref(false);
@@ -74,6 +76,46 @@ const showAnimation = ref(false);
 const animationProduct = ref<Product | null>(null);
 const animationStart = ref({ x: 0, y: 0 });
 const animationEnd = ref({ x: 0, y: 0 });
+
+// Helper functions for stock display
+function getStockLevel(product: Product): number {
+  return productStore.getTotalAvailableStock(product);
+}
+
+function getStockMessage(product: Product): string {
+  const stockLevel = getStockLevel(product);
+
+  if (stockLevel === 0) {
+    return 'Leider kein Bestand mehr';
+  }
+
+  if (product.hasVariants) {
+    // For variant products, just show "Available" or stock count
+    return stockLevel <= 5 ? `Nur noch ${stockLevel} verfügbar` : 'Auf Lager';
+  }
+
+  return stockLevel <= 5 ? `Nur noch ${stockLevel} verfügbar` : 'Auf Lager';
+}
+
+function getButtonText(product: Product): string {
+  const stockLevel = getStockLevel(product);
+
+  if (stockLevel === 0) {
+    return 'Leider ausverkauft';
+  }
+
+  if (product.hasVariants) {
+    return 'Optionen wählen';
+  }
+
+  return 'In den Warenkorb';
+}
+
+function navigateToProduct(sku: string, event: MouseEvent) {
+  event.preventDefault();
+  event.stopPropagation();
+  router.push(`/product/${sku}`);
+}
 
 function addToCart(product: Product, event: MouseEvent) {
   const success = cartStore.addToCart(product);
@@ -191,22 +233,24 @@ h1 {
 }
 
 .product-card {
-  background-color: var(--background-light);
+  background-color: white;
   border-radius: 8px;
   border: 1px solid var(--border-color);
   overflow: hidden;
-  transition: transform 0.3s ease;
+  transition: all 0.15s ease-in-out;
   display: flex;
   flex-direction: column;
   width: 100%;
   height: 100%;
   max-width: 200px;
   margin: 0 auto;
+  box-shadow: var(--shadow-sm);
 }
 
 .product-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--border-color);
 }
 
 .product-link {
@@ -291,12 +335,12 @@ h1 {
   background-color: #000;
   color: #fff;
   border: none;
-  padding: 0.5rem;
+  padding: 0.6rem;
   border-radius: 0 0 8px 8px;
-  font-size: 0.8rem;
-  font-weight: 600;
+  font-size: 0.75rem;
+  font-weight: 700;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.15s ease-in-out;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   width: 100%;
@@ -304,13 +348,14 @@ h1 {
 }
 
 .add-to-cart:hover:not(:disabled) {
-  background-color: #333;
+  background-color: #1a1a1a;
+  transform: translateY(-1px);
 }
 
 .add-to-cart:disabled {
-  background-color: #666;
+  background-color: #999;
   cursor: not-allowed;
-  opacity: 0.7;
+  opacity: 0.6;
 }
 
 .out-of-stock {
