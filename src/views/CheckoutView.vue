@@ -366,9 +366,14 @@ const submitOrder = async (): Promise<void> => {
       items: cartStore.items.map(item => ({
         sku: item.sku,  // This is now the variant SKU
         quantity: item.quantity,
+        price: item.price,  // Base product price
+        customizationTotalPrice: item.customizationTotalPrice || 0,
+        finalPrice: item.finalPrice || item.price,  // Total including customizations
         selectedVariants: item.selectedVariants,  // Include variant info for backend tracking
         customizations: item.selectedCustomizations?.map(c => ({
           customizationId: c.customizationId,
+          customizationName: c.customizationName,
+          totalPrice: c.totalPrice,
           fields: c.fields.map(f => ({
             fieldId: f.fieldId,
             value: f.value

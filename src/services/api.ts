@@ -30,6 +30,11 @@ export async function createOrder(orderData: any): Promise<{ paymentUrl: string 
   }
 
   try {
+    // Calculate total order amount
+    const totalAmount = orderData.items.reduce((sum: number, item: any) =>
+      sum + (item.finalPrice * item.quantity), 0
+    );
+
     const formData = new FormData();
     formData.append('orderNumber', orderData.orderNumber);
     formData.append('email', orderData.customer.email);
@@ -40,6 +45,7 @@ export async function createOrder(orderData: any): Promise<{ paymentUrl: string 
     formData.append('zipCode', orderData.customer.zipCode);
     formData.append('address', orderData.customer.address);
     formData.append('country', orderData.customer.country);
+    formData.append('totalAmount', totalAmount.toFixed(2));
     if(orderData.transactionId) {
       formData.append('transactionId', orderData.transactionId);
     }
@@ -48,6 +54,31 @@ export async function createOrder(orderData: any): Promise<{ paymentUrl: string 
     orderData.items.forEach((item, index) => {
       formData.append(`lineItems[${index}][sku]`, item.sku);
       formData.append(`lineItems[${index}][quantity]`, item.quantity.toString());
+      formData.append(`lineItems[${index}][price]`, item.price.toFixed(2));
+      formData.append(`lineItems[${index}][customizationTotalPrice]`, item.customizationTotalPrice.toFixed(2));
+      formData.append(`lineItems[${index}][finalPrice]`, item.finalPrice.toFixed(2));
+
+      // Add selected variants
+      if (item.selectedVariants) {
+        Object.entries(item.selectedVariants).forEach(([key, value]) => {
+          formData.append(`lineItems[${index}][selectedVariants][${key}]`, String(value));
+        });
+      }
+
+      // Add customizations
+      if (item.customizations && item.customizations.length > 0) {
+        item.customizations.forEach((customization, custIndex) => {
+          formData.append(`lineItems[${index}][customizations][${custIndex}][customizationId]`, customization.customizationId);
+          formData.append(`lineItems[${index}][customizations][${custIndex}][customizationName]`, customization.customizationName);
+          formData.append(`lineItems[${index}][customizations][${custIndex}][totalPrice]`, customization.totalPrice.toFixed(2));
+
+          // Add customization fields
+          customization.fields.forEach((field, fieldIndex) => {
+            formData.append(`lineItems[${index}][customizations][${custIndex}][fields][${fieldIndex}][fieldId]`, field.fieldId);
+            formData.append(`lineItems[${index}][customizations][${custIndex}][fields][${fieldIndex}][value]`, String(field.value));
+          });
+        });
+      }
     });
 
     const response = await fetch(`${API_BASE_URL}/Actindo.Modules.Actindo.POS.ClickAndCollectShop.placeOrder`, {
