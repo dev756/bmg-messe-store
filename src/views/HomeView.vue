@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <h1>Unsere Produkte</h1>
+    <h1>Unsere VIP Produkte</h1>
     <div v-if="productStore.isLoading" class="loading">
       <div class="loading-spinner"></div>
       <p>Produkte werden geladen...</p>
@@ -200,22 +200,12 @@ h1 {
 
 .products-grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 0.5rem;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
   width: 100%;
   padding: 0;
-}
-
-@media (max-width: 1400px) {
-  .products-grid {
-    grid-template-columns: repeat(4, 1fr);
-  }
-}
-
-@media (max-width: 1000px) {
-  .products-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
+  max-width: 900px;
+  margin: 0 auto;
 }
 
 @media (max-width: 768px) {
@@ -228,7 +218,8 @@ h1 {
   }
 
   .products-grid {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: 1fr;
+    gap: 1rem;
   }
 }
 
@@ -242,8 +233,6 @@ h1 {
   flex-direction: column;
   width: 100%;
   height: 100%;
-  max-width: 200px;
-  margin: 0 auto;
   box-shadow: var(--shadow-sm);
 }
 
@@ -283,18 +272,18 @@ h1 {
 }
 
 .product-info {
-  padding: 0.75rem;
+  padding: 1rem;
   display: flex;
   flex-direction: column;
   flex-grow: 1;
-  min-height: 80px;
+  min-height: 100px;
   background-color: var(--background-light);
 }
 
 .product-name {
-  font-size: 0.9rem;
+  font-size: 1.1rem;
   font-weight: 600;
-  margin: 0 0 0.25rem 0;
+  margin: 0 0 0.5rem 0;
   color: var(--text-color);
   line-height: 1.3;
   display: -webkit-box;
@@ -322,8 +311,8 @@ h1 {
 .stock {
   color: var(--text-secondary);
   margin: 0;
-  font-size: 0.8rem;
-  padding: 0.1rem 0.75rem 0.25rem 0.75rem;
+  font-size: 0.85rem;
+  padding: 0.25rem 1rem 0.5rem 1rem;
   background-color: var(--background-light);
 }
 
@@ -335,9 +324,9 @@ h1 {
   background-color: #000;
   color: #fff;
   border: none;
-  padding: 0.6rem;
+  padding: 0.75rem;
   border-radius: 0 0 8px 8px;
-  font-size: 0.75rem;
+  font-size: 0.85rem;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.15s ease-in-out;
@@ -364,15 +353,6 @@ h1 {
   margin-top: 0.5rem;
 }
 
-@media (max-width: 480px) {
-  .products-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .product-image {
-    height: 280px;
-  }
-}
 
 .loading, .error {
   text-align: center;
